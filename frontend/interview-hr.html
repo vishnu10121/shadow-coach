@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ShadowCoach AI - HR Interview</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Outfit', sans-serif; background: #0a0a0a; min-height: 100vh; }
+        .dashboard { display: flex; min-height: 100vh; }
+        
+        .sidebar {
+            width: 280px;
+            background: #0f0f0f;
+            border-right: 1px solid #1a1a1a;
+            padding: 32px 24px;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+        }
+        
+        .logo { display: flex; align-items: center; gap: 12px; margin-bottom: 48px; }
+        .logo-icon { width: 44px; height: 44px; background: linear-gradient(135deg, #271fa4 0%, #3b82f6 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 18px; color: white; }
+        .logo-text h2 { font-size: 20px; font-weight: 800; }
+        .logo-text h2 .shadow { background: linear-gradient(135deg, #fff 0%, #94a3b8 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+        .logo-text h2 .ai { color: #3b82f6; }
+        .logo-text p { font-size: 9px; color: #3b82f6; letter-spacing: 1.5px; margin-top: 2px; }
+        
+        .nav-menu { list-style: none; margin-top: 8px; }
+        .nav-item { display: flex; align-items: center; gap: 14px; padding: 14px 16px; margin: 4px 0; border-radius: 12px; cursor: pointer; transition: all 0.3s; color: #888; font-weight: 500; }
+        .nav-item:hover, .nav-item.active { background: #1a1a1a; color: white; }
+        .nav-item:hover svg, .nav-item.active svg { stroke: #3b82f6; }
+        .nav-item svg { width: 22px; height: 22px; stroke: #888; stroke-width: 1.5; fill: none; }
+        
+        .user-section { position: absolute; bottom: 32px; left: 24px; right: 24px; padding: 16px; background: #1a1a1a; border-radius: 16px; display: flex; align-items: center; gap: 12px; border: 1px solid #2a2a2a; }
+        .user-avatar { width: 44px; height: 44px; background: linear-gradient(135deg, #271fa4 0%, #3b82f6 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 18px; color: white; }
+        .user-info { flex: 1; }
+        .user-name { font-weight: 700; color: white; font-size: 16px; }
+        .logout-btn { font-size: 13px; color: #888; cursor: pointer; }
+        .logout-btn:hover { color: #ef4444; }
+        
+        .main-content { flex: 1; margin-left: 280px; padding: 32px 48px; }
+        .page-header { margin-bottom: 24px; }
+        .page-header h1 { font-size: 32px; font-weight: 700; color: white; margin-bottom: 8px; }
+        .page-header p { color: #888; }
+        
+        .company-grid { display: flex; gap: 16px; margin-bottom: 24px; flex-wrap: wrap; }
+        .company-card { background: #1a1a1a; border: 2px solid transparent; border-radius: 16px; padding: 16px 24px; display: flex; align-items: center; gap: 12px; cursor: pointer; transition: all 0.3s; }
+        .company-card.selected { border-color: #3b82f6; background: rgba(59,130,246,0.1); }
+        .company-icon { width: 40px; height: 40px; background: white; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+        .company-name { font-weight: 600; color: white; }
+        
+        .role-selector { margin-bottom: 24px; }
+        .role-buttons { display: flex; gap: 16px; margin-top: 12px; flex-wrap: wrap; }
+        .role-btn { padding: 12px 24px; background: #1a1a1a; border: 2px solid transparent; border-radius: 12px; color: #888; font-weight: 600; cursor: pointer; transition: all 0.3s; }
+        .role-btn.selected { border-color: #3b82f6; background: rgba(59,130,246,0.1); color: #3b82f6; }
+        
+        .start-btn { width: 100%; padding: 16px; background: linear-gradient(135deg, #271fa4, #3b82f6); color: white; border: none; border-radius: 16px; font-size: 18px; font-weight: 700; cursor: pointer; margin-top: 24px; transition: all 0.3s; }
+        .start-btn:hover { transform: translateY(-2px); box-shadow: 0 5px 20px rgba(59,130,246,0.3); }
+        
+        .question-card { background: #0f0f0f; border: 1px solid #1a1a1a; border-radius: 24px; padding: 32px; margin-top: 24px; }
+        .question-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid #2a2a2a; }
+        .company-badge { display: flex; align-items: center; gap: 12px; }
+        .company-icon-small { width: 40px; height: 40px; background: white; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+        .question-count { color: #888; font-size: 14px; }
+        .question-text { font-size: 20px; font-weight: 600; color: white; line-height: 1.4; margin-bottom: 24px; }
+        .answer-input { width: 100%; padding: 16px; background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 16px; font-size: 16px; color: white; font-family: inherit; resize: vertical; min-height: 180px; margin-bottom: 20px; }
+        .answer-input:focus { outline: none; border-color: #3b82f6; }
+        .feedback-area { background: #1a1a1a; border-radius: 16px; padding: 20px; margin-bottom: 24px; display: none; }
+        .feedback-title { color: #3b82f6; margin-bottom: 8px; font-weight: 600; }
+        .feedback-text { color: #cbd5e1; font-size: 14px; line-height: 1.5; }
+        .next-btn { padding: 12px 28px; background: linear-gradient(135deg, #271fa4, #3b82f6); border: none; border-radius: 40px; color: white; font-weight: 600; cursor: pointer; margin-top: 20px; transition: all 0.3s; }
+        .next-btn:hover { transform: translateY(-2px); }
+        
+        @media (max-width: 768px) { .sidebar { width: 80px; padding: 24px 16px; } .logo-text, .nav-item span { display: none; } .main-content { margin-left: 80px; padding: 24px; } .company-grid { flex-direction: column; } }
+    </style>
+</head>
+<body>
+    <div class="dashboard">
+        <div class="sidebar">
+            <div class="logo"><div class="logo-icon">⚡</div><div class="logo-text"><h2><span class="shadow">ShadowCoach</span><span class="ai"> AI</span></h2><p>YOUR INTERVIEW COACH</p></div></div>
+            <ul class="nav-menu">
+                <li class="nav-item" onclick="location.href='dashboard.html'"><svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2h-5v-7H9v7H4a2 2 0 0 1-2-2z"/></svg><span>Dashboard</span></li>
+                <li class="nav-item" onclick="location.href='resume-checker.html'"><svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg><span>Resume</span></li>
+                <li class="nav-item" onclick="location.href='interview-coding.html'"><svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><span>Coding</span></li>
+                <li class="nav-item active"><svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path d="M12 8v4l3 3M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/></svg><span>HR Interview</span></li>
+                <li class="nav-item" onclick="location.href='prep-kit.html'"><svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg><span>Prep Kit</span></li>
+            </ul>
+            <div class="user-section"><div class="user-avatar" id="userAvatar">V</div><div class="user-info"><div class="user-name" id="userName">vishnu</div><div class="logout-btn" onclick="logout()">Logout</div></div></div>
+        </div>
+
+        <div class="main-content">
+            <div class="page-header"><h1><i class="fas fa-user-tie"></i> HR Interview</h1><p>Role-specific behavioral and technical HR questions</p></div>
+            
+            <div id="setupPanel">
+                <div class="company-grid" id="companyGrid"></div>
+                <div class="role-selector"><h3 style="color:white; margin-bottom:12px;">Select Your Role</h3><div class="role-buttons" id="roleButtons"></div></div>
+                <button class="start-btn" onclick="startInterview()">Start HR Interview →</button>
+            </div>
+
+            <div id="interviewPanel" style="display:none;"></div>
+        </div>
+    </div>
+
+    <script>
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
+        const token = localStorage.getItem('token');
+        if (!token) window.location.href = 'login.html';
+        document.getElementById('userName').innerHTML = user.name || 'vishnu';
+        document.getElementById('userAvatar').innerHTML = (user.name || 'V').charAt(0).toUpperCase();
+        function logout() { localStorage.clear(); window.location.href = 'login.html'; }
+
+        const companies = [
+            { name: 'Google', icon: 'fab fa-google', color: '#4285f4' },
+            { name: 'Amazon', icon: 'fab fa-amazon', color: '#ff9900' },
+            { name: 'Microsoft', icon: 'fab fa-microsoft', color: '#00a4ef' },
+            { name: 'Meta', icon: 'fab fa-facebook-f', color: '#0064e1' },
+            { name: 'Apple', icon: 'fab fa-apple', color: '#000' },
+            { name: 'Netflix', icon: 'fas fa-tv', color: '#e50914' }
+        ];
+
+        // Role-specific HR Questions (3 questions each role)
+        const hrQuestions = {
+            'Software Engineer': {
+                Google: [
+                    "Tell me about yourself and why you want to work at Google as a Software Engineer.",
+                    "Describe a challenging technical project you worked on. What was your role and how did you overcome obstacles?",
+                    "How do you stay updated with the latest software engineering trends and technologies?"
+                ],
+                Amazon: [
+                    "Tell me about yourself and how you embody Amazon's Leadership Principles as a Software Engineer.",
+                    "Describe a time you took ownership of a project. What was the outcome?",
+                    "How do you handle tight deadlines and pressure in software development?"
+                ],
+                Microsoft: [
+                    "Tell me about yourself and why you're passionate about Microsoft's mission as a Software Engineer.",
+                    "Describe your most technically challenging project. What did you learn?",
+                    "How do you approach learning new technologies and tools?"
+                ],
+                Meta: [
+                    "Tell me about yourself and how you would contribute to Meta's 'Move Fast' culture as a Software Engineer.",
+                    "Describe a time you had a technical disagreement with a teammate. How did you resolve it?",
+                    "What's your approach to writing clean, maintainable code?"
+                ],
+                Apple: [
+                    "Tell me about yourself and what innovation means to you as a Software Engineer at Apple.",
+                    "Describe a time you went above and beyond to deliver a high-quality product.",
+                    "How do you ensure quality in your software development process?"
+                ],
+                Netflix: [
+                    "Tell me about yourself and how you embody Netflix's 'Freedom and Responsibility' culture.",
+                    "Describe a time you made a difficult technical decision. What was the impact?",
+                    "How do you balance speed and quality in software delivery?"
+                ]
+            },
+            'Data Scientist': {
+                Google: [
+                    "Tell me about yourself and why you want to work at Google as a Data Scientist. What data science problems excite you?",
+                    "Describe a machine learning project you worked on. What was the problem, approach, and outcome? How did you evaluate your model?",
+                    "Explain how you would handle imbalanced datasets in a classification problem. What techniques would you use?"
+                ],
+                Amazon: [
+                    "Tell me about yourself and how you use data to drive decisions at Amazon scale.",
+                    "Describe a time you used A/B testing to validate a hypothesis. What was the result?",
+                    "How do you communicate complex analytical results to non-technical stakeholders and business leaders?"
+                ],
+                Microsoft: [
+                    "Tell me about yourself and your experience with data science at Microsoft scale.",
+                    "Describe a project where you built a predictive model. What features did you use and how did you validate?",
+                    "What's your approach to feature engineering and model selection? When would you use random forest vs gradient boosting?"
+                ],
+                Meta: [
+                    "Tell me about yourself and how you use data to understand user behavior at Meta scale.",
+                    "Describe a time you had to deal with biased data or algorithmic bias. How did you handle it?",
+                    "What's your experience with experimentation and causal inference? How do you measure treatment effects?"
+                ],
+                Apple: [
+                    "Tell me about yourself and how you combine data science with product intuition at Apple.",
+                    "Describe a time your analysis led to a significant business impact. What metrics improved?",
+                    "How do you validate your models before deployment? What's your ML testing strategy?"
+                ],
+                Netflix: [
+                    "Tell me about yourself and your experience with recommendation systems and personalization.",
+                    "Describe how you would measure the success of a new recommendation algorithm beyond just accuracy.",
+                    "How do you handle large-scale data processing challenges? What tools and techniques do you use?"
+                ]
+            },
+            'Full Stack Developer': {
+                Google: [
+                    "Tell me about yourself and your experience across the full stack as a Full Stack Developer.",
+                    "Describe a full-stack project you built from scratch. What technologies did you use and why?",
+                    "How do you balance frontend polish with backend performance and scalability?"
+                ],
+                Amazon: [
+                    "Tell me about yourself and your experience with scalable web applications at Amazon scale.",
+                    "Describe a time you optimized a slow web application. What was the bottleneck and how did you fix it?",
+                    "How do you ensure security across your full-stack applications from frontend to database?"
+                ],
+                Microsoft: [
+                    "Tell me about yourself and your experience with both frontend and backend development at Microsoft.",
+                    "Describe a challenging integration between frontend and backend systems you worked on.",
+                    "How do you approach API design and documentation? What makes a good REST API?"
+                ],
+                Meta: [
+                    "Tell me about yourself and your experience with real-time web applications at Meta scale.",
+                    "Describe a time you improved application performance. What techniques did you use?",
+                    "How do you manage state across client and server in modern web applications?"
+                ],
+                Apple: [
+                    "Tell me about yourself and your attention to detail as a Full Stack Developer at Apple.",
+                    "Describe a project where you focused on user experience and responsive design.",
+                    "How do you ensure cross-browser compatibility and responsive design across devices?"
+                ],
+                Netflix: [
+                    "Tell me about yourself and your experience with microservices architecture at Netflix scale.",
+                    "Describe how you would design a scalable web application handling millions of users.",
+                    "How do you handle cross-origin resource sharing (CORS) and API security in distributed systems?"
+                ]
+            }
+        };
+
+        let selectedCompany = null;
+        let selectedCompanyIcon = null;
+        let selectedCompanyColor = null;
+        let selectedRole = null;
+        let currentQuestions = [];
+        let currentIndex = 0;
+        let answers = [];
+        let totalScore = 0;
+
+        function renderCompanies() {
+            const container = document.getElementById('companyGrid');
+            container.innerHTML = companies.map(c => `
+                <div class="company-card" onclick="selectCompany('${c.name}', '${c.icon}', '${c.color}')" data-company="${c.name}">
+                    <div class="company-icon" style="color:${c.color};"><i class="${c.icon} fa-lg"></i></div>
+                    <span class="company-name">${c.name}</span>
+                </div>
+            `).join('');
+        }
+
+        function selectCompany(name, icon, color) {
+            selectedCompany = name;
+            selectedCompanyIcon = icon;
+            selectedCompanyColor = color;
+            document.querySelectorAll('.company-card').forEach(card => card.classList.remove('selected'));
+            document.querySelector(`.company-card[data-company="${name}"]`).classList.add('selected');
+        }
+
+        function renderRoles() {
+            const container = document.getElementById('roleButtons');
+            const roles = ['Software Engineer', 'Data Scientist', 'Full Stack Developer'];
+            container.innerHTML = roles.map(r => `<button class="role-btn" onclick="selectRole('${r}')">${r}</button>`).join('');
+        }
+
+        function selectRole(role) {
+            selectedRole = role;
+            document.querySelectorAll('.role-btn').forEach(btn => btn.classList.remove('selected'));
+            event.target.classList.add('selected');
+        }
+
+        function startInterview() {
+            if (!selectedCompany) { alert('Please select a company'); return; }
+            if (!selectedRole) { alert('Please select your role'); return; }
+            
+            currentQuestions = hrQuestions[selectedRole]?.[selectedCompany];
+            if (!currentQuestions) {
+                // Fallback to Software Engineer questions
+                currentQuestions = hrQuestions['Software Engineer'][selectedCompany];
+                if (!currentQuestions) { alert('Questions not available for this combination'); return; }
+            }
+            
+            currentIndex = 0;
+            answers = [];
+            totalScore = 0;
+            
+            document.getElementById('setupPanel').style.display = 'none';
+            document.getElementById('interviewPanel').style.display = 'block';
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            const container = document.getElementById('interviewPanel');
+            container.innerHTML = `
+                <div class="question-card">
+                    <div class="question-header">
+                        <div class="company-badge">
+                            <div class="company-icon-small" style="color:${selectedCompanyColor};"><i class="${selectedCompanyIcon} fa-lg"></i></div>
+                            <span style="font-weight:600; color:white;">${selectedCompany} • ${selectedRole}</span>
+                        </div>
+                        <div class="question-count">Question ${currentIndex + 1} of ${currentQuestions.length}</div>
+                    </div>
+                    <div class="question-text">${currentQuestions[currentIndex]}</div>
+                    <textarea class="answer-input" id="answerInput" rows="6" placeholder="Type your answer here... Use the STAR method (Situation, Task, Action, Result) for behavioral questions"></textarea>
+                    <div class="feedback-area" id="feedbackArea">
+                        <div class="feedback-title"><i class="fas fa-robot"></i> AI Feedback & Scoring</div>
+                        <div class="feedback-text" id="feedbackText"></div>
+                    </div>
+                    <button class="next-btn" id="nextBtn" onclick="submitAnswer()">
+                        ${currentIndex === currentQuestions.length - 1 ? 'Complete Interview →' : 'Next Question →'}
+                    </button>
+                </div>
+            `;
+        }
+
+        function submitAnswer() {
+            const answer = document.getElementById('answerInput').value.trim();
+            if (!answer) { alert('Please provide an answer'); return; }
+            
+            // Advanced AI-based scoring
+            let score = 60;
+            const hasSTAR = answer.toLowerCase().includes('situation') || answer.toLowerCase().includes('task') || answer.toLowerCase().includes('action') || answer.toLowerCase().includes('result');
+            const hasDetail = answer.length > 200;
+            const hasMetrics = answer.match(/\d+%/g) || answer.match(/\d+\s*(?:people|customers|users|dollars|revenue)/gi);
+            const hasTechnical = answer.toLowerCase().includes('python') || answer.toLowerCase().includes('sql') || answer.toLowerCase().includes('model') || answer.toLowerCase().includes('algorithm') || answer.toLowerCase().includes('data');
+            const hasStructure = answer.split('.').length > 3;
+            
+            if (hasSTAR) score += 15;
+            if (hasDetail) score += 10;
+            if (hasMetrics) score += 10;
+            if (hasTechnical) score += 10;
+            if (hasStructure) score += 5;
+            if (answer.length > 300) score += 5;
+            
+            score = Math.min(100, Math.max(0, score));
+            totalScore += score;
+            
+            let feedback = '';
+            let strengths = [];
+            let improvements = [];
+            
+            if (hasSTAR) strengths.push('✓ Used STAR method effectively');
+            else improvements.push('✗ Use STAR method (Situation, Task, Action, Result) to structure your answer');
+            
+            if (hasMetrics) strengths.push('✓ Included quantifiable metrics');
+            else improvements.push('✗ Add specific numbers/metrics to show impact');
+            
+            if (hasDetail) strengths.push('✓ Provided detailed explanation');
+            else improvements.push('✗ Add more specific details and examples');
+            
+            if (hasTechnical) strengths.push('✓ Demonstrated technical knowledge');
+            else improvements.push('✗ Include relevant technical details');
+            
+            if (score >= 85) feedback = `Excellent answer! Score: ${score}%\n\nStrengths:\n${strengths.join('\n')}\n\nYour response is well-structured and compelling.`;
+            else if (score >= 70) feedback = `Good answer! Score: ${score}%\n\n${strengths.length > 0 ? 'Strengths:\n' + strengths.join('\n') + '\n\n' : ''}Areas to improve:\n${improvements.join('\n')}`;
+            else feedback = `Good attempt! Score: ${score}%\n\nAreas to improve:\n${improvements.join('\n')}\n\nTry to provide more specific examples with the STAR method.`;
+            
+            answers.push({ question: currentQuestions[currentIndex], answer: answer, score: score });
+            
+            document.getElementById('feedbackText').innerHTML = feedback.replace(/\n/g, '<br>');
+            document.getElementById('feedbackArea').style.display = 'block';
+            document.getElementById('nextBtn').disabled = true;
+            
+            currentIndex++;
+            
+            if (currentIndex < currentQuestions.length) {
+                setTimeout(() => {
+                    document.getElementById('feedbackArea').style.display = 'none';
+                    loadQuestion();
+                }, 3000);
+            } else {
+                setTimeout(() => completeInterview(), 2500);
+            }
+        }
+
+        function completeInterview() {
+            const finalScore = Math.round(totalScore / answers.length);
+            
+            // Save to localStorage
+            let stats = JSON.parse(localStorage.getItem('stats') || '{}');
+            stats.totalInterviews = (stats.totalInterviews || 0) + 1;
+            stats.completed = (stats.completed || 0) + 1;
+            stats.avgScore = Math.round(((stats.avgScore || 0) * (stats.completed - 1) + finalScore) / stats.completed);
+            localStorage.setItem('stats', JSON.stringify(stats));
+            
+            const history = JSON.parse(localStorage.getItem('interviewHistory') || '[]');
+            history.unshift({
+                date: new Date().toISOString(),
+                company: selectedCompany,
+                role: selectedRole,
+                type: 'HR',
+                score: finalScore,
+                answers: answers
+            });
+            localStorage.setItem('interviewHistory', JSON.stringify(history.slice(0, 20)));
+            
+            let recommendation = '';
+            if (finalScore >= 85) recommendation = '🎯 Excellent performance! You are well-prepared for the actual interview. Keep practicing to maintain this level.';
+            else if (finalScore >= 70) recommendation = '📈 Good job! Focus on adding more specific metrics and using the STAR method consistently to improve your answers.';
+            else recommendation = '💪 Keep practicing! Review the feedback above and try to implement the STAR method with specific examples and metrics.';
+            
+            document.getElementById('interviewPanel').innerHTML = `
+                <div class="question-card" style="text-align:center;">
+                    <div style="font-size:64px; margin-bottom:20px;">🎉</div>
+                    <div style="font-size:48px; font-weight:800; color:#3b82f6; margin-bottom:16px;">${finalScore}%</div>
+                    <div style="font-size:20px; color:white; margin-bottom:24px;">HR Interview Complete!</div>
+                    <div style="background:#1a1a1a; border-radius:16px; padding:20px; margin-bottom:24px; text-align:left;">
+                        <strong style="color:#3b82f6;">📊 Question-wise Breakdown:</strong><br><br>
+                        ${answers.map((a, i) => `<div style="margin-bottom:12px; display:flex; justify-content:space-between;"><span style="color:#3b82f6;">Q${i+1}</span> <span style="color:white;">Score: ${a.score}%</span></div>`).join('')}
+                        <div style="margin-top:16px; padding-top:16px; border-top:1px solid #2a2a2a;">
+                            <strong style="color:#3b82f6;">🎯 Recommendation:</strong><br>
+                            ${recommendation}
+                        </div>
+                    </div>
+                    <button onclick="resetInterview()" style="background:#3b82f6; border:none; padding:14px 32px; border-radius:40px; color:white; font-weight:600; cursor:pointer; transition:all 0.3s;">Practice Again →</button>
+                </div>
+            `;
+        }
+
+        function resetInterview() {
+            selectedCompany = null;
+            selectedRole = null;
+            currentIndex = 0;
+            answers = [];
+            totalScore = 0;
+            document.getElementById('setupPanel').style.display = 'block';
+            document.getElementById('interviewPanel').style.display = 'none';
+            document.querySelectorAll('.company-card').forEach(card => card.classList.remove('selected'));
+            document.querySelectorAll('.role-btn').forEach(btn => btn.classList.remove('selected'));
+        }
+
+        renderCompanies();
+        renderRoles();
+    </script>
+</body>
+</html>

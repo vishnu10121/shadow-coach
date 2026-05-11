@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ShadowCoach AI - History</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Outfit',-apple-system,sans-serif;background:#0a0a0a;min-height:100vh;color:white}
+.dashboard{display:flex;min-height:100vh}
+
+/* ── SIDEBAR ── */
+.sidebar{width:280px;background:#0f0f0f;border-right:1px solid #1a1a1a;padding:32px 24px;position:fixed;height:100vh;overflow-y:auto;z-index:10}
+.logo{display:flex;align-items:center;gap:12px;margin-bottom:48px}
+.logo-icon{width:44px;height:44px;background:linear-gradient(135deg,#271fa4 0%,#3b82f6 100%);border-radius:12px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:18px;color:white}
+.logo-text h2{font-size:20px;font-weight:800;letter-spacing:-.5px}
+.shadow{background:linear-gradient(135deg,#fff 0%,#94a3b8 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.ai{color:#3b82f6}
+.logo-text p{font-size:9px;color:#3b82f6;letter-spacing:1.5px;font-weight:600;margin-top:2px}
+.nav-menu{list-style:none;margin-top:8px}
+.nav-item{display:flex;align-items:center;gap:14px;padding:14px 16px;margin:4px 0;border-radius:12px;cursor:pointer;transition:all .3s;color:#888;font-weight:500;font-size:16px}
+.nav-item svg{width:22px;height:22px;stroke:#888;stroke-width:1.5;fill:none;flex-shrink:0}
+.nav-item:hover,.nav-item.active{background:#1a1a1a;color:white}
+.nav-item:hover svg,.nav-item.active svg{stroke:#3b82f6}
+.user-section{position:absolute;bottom:32px;left:24px;right:24px;padding:16px;background:#1a1a1a;border-radius:16px;display:flex;align-items:center;gap:12px;border:1px solid #2a2a2a}
+.user-avatar{width:44px;height:44px;background:linear-gradient(135deg,#271fa4 0%,#3b82f6 100%);border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:18px;color:white;flex-shrink:0}
+.user-info{flex:1}
+.user-name{font-weight:700;color:white;font-size:16px}
+.logout-btn{font-size:13px;color:#888;cursor:pointer;transition:color .3s}
+.logout-btn:hover{color:#ef4444}
+
+/* ── MAIN ── */
+.main-content{flex:1;margin-left:280px;padding:36px 48px 60px}
+
+/* ── HEADER ── */
+.page-header{margin-bottom:32px}
+.page-header h1{font-size:36px;font-weight:700;margin-bottom:6px}
+.page-header p{font-size:16px;color:#888}
+
+/* ── STATS ROW ── */
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:36px}
+.stat-card{background:#0f0f0f;border:1px solid #1a1a1a;border-radius:20px;padding:24px;display:flex;flex-direction:column;gap:8px;position:relative;overflow:hidden}
+.stat-card::after{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,#271fa4,#3b82f6)}
+.stat-label{font-size:13px;color:#888;font-weight:500;letter-spacing:.3px}
+.stat-value{font-size:32px;font-weight:800;color:white;line-height:1}
+.stat-sub{font-size:12px;color:#555}
+.stat-icon{position:absolute;right:20px;top:20px;width:36px;height:36px;background:#1a1a1a;border-radius:10px;display:flex;align-items:center;justify-content:center}
+.stat-icon svg{width:18px;height:18px;stroke:#3b82f6;fill:none;stroke-width:1.5}
+
+/* ── FILTERS ── */
+.filters-bar{display:flex;align-items:center;gap:12px;margin-bottom:24px;flex-wrap:wrap}
+.filter-btn{padding:8px 18px;background:#1a1a1a;border:1px solid #2a2a2a;border-radius:20px;color:#888;font-size:14px;font-weight:500;cursor:pointer;transition:all .2s;font-family:'Outfit',sans-serif}
+.filter-btn.active,.filter-btn:hover{background:rgba(59,130,246,.15);border-color:#3b82f6;color:#3b82f6}
+.search-box{flex:1;max-width:280px;position:relative}
+.search-box input{width:100%;padding:9px 16px 9px 38px;background:#1a1a1a;border:1px solid #2a2a2a;border-radius:20px;color:white;font-size:14px;font-family:'Outfit',sans-serif;outline:none;transition:border .2s}
+.search-box input:focus{border-color:#3b82f6}
+.search-box input::placeholder{color:#555}
+.search-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);width:16px;height:16px;stroke:#555;fill:none;stroke-width:1.5}
+
+/* ── SORT ── */
+.sort-select{padding:9px 14px;background:#1a1a1a;border:1px solid #2a2a2a;border-radius:20px;color:#888;font-size:14px;font-family:'Outfit',sans-serif;cursor:pointer;margin-left:auto}
+.sort-select:focus{outline:none;border-color:#3b82f6}
+
+/* ── HISTORY LIST ── */
+.history-list{display:flex;flex-direction:column;gap:14px}
+
+.history-card{background:#0f0f0f;border:1px solid #1a1a1a;border-radius:20px;padding:24px 28px;display:flex;align-items:center;gap:20px;cursor:pointer;transition:all .25s;position:relative;overflow:hidden}
+.history-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:linear-gradient(180deg,#271fa4,#3b82f6);border-radius:0 2px 2px 0;opacity:0;transition:opacity .3s}
+.history-card:hover{border-color:#2a2a2a;transform:translateX(4px);box-shadow:0 4px 24px rgba(0,0,0,.3)}
+.history-card:hover::before{opacity:1}
+
+.card-company-badge{width:52px;height:52px;border-radius:14px;background:#1a1a1a;border:1px solid #2a2a2a;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-weight:800;font-size:18px}
+
+.card-info{flex:1;min-width:0}
+.card-row1{display:flex;align-items:center;gap:10px;margin-bottom:4px}
+.card-company-name{font-size:17px;font-weight:700;color:white}
+.card-role{font-size:13px;color:#888;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.card-date{font-size:12px;color:#555;display:flex;align-items:center;gap:5px;margin-top:4px}
+.card-date svg{width:12px;height:12px;stroke:#555;fill:none;stroke-width:1.5}
+
+.card-tags{display:flex;gap:8px;flex-wrap:wrap}
+.card-tag{padding:3px 10px;background:#1a1a1a;border:1px solid #2a2a2a;border-radius:20px;font-size:11px;color:#888}
+
+.card-score-block{display:flex;flex-direction:column;align-items:center;gap:4px;flex-shrink:0}
+.score-ring{width:64px;height:64px;position:relative}
+.score-ring svg{transform:rotate(-90deg)}
+.score-ring-text{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:800;color:white}
+.score-label{font-size:11px;color:#555;text-align:center}
+
+.card-chevron{width:20px;height:20px;stroke:#555;fill:none;stroke-width:1.5;flex-shrink:0;transition:transform .2s}
+.history-card:hover .card-chevron{transform:translateX(3px);stroke:#3b82f6}
+
+/* ── EMPTY STATE ── */
+.empty-state{text-align:center;padding:80px 40px;color:#555}
+.empty-icon{font-size:64px;margin-bottom:20px;display:block}
+.empty-state h3{font-size:22px;font-weight:700;color:#888;margin-bottom:8px}
+.empty-state p{font-size:15px;margin-bottom:28px}
+.empty-cta{display:inline-flex;align-items:center;gap:8px;padding:14px 28px;background:linear-gradient(135deg,#271fa4,#3b82f6);border:none;border-radius:40px;color:white;font-size:16px;font-weight:700;cursor:pointer;font-family:'Outfit',sans-serif;text-decoration:none;transition:all .2s}
+.empty-cta:hover{opacity:.9;transform:translateY(-2px)}
+
+/* ── DETAIL MODAL ── */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.85);backdrop-filter:blur(8px);z-index:100;display:none;align-items:flex-start;justify-content:center;padding:24px;overflow-y:auto}
+.modal-overlay.show{display:flex}
+.modal-box{background:#0f0f0f;border:1px solid #2a2a2a;border-radius:24px;width:100%;max-width:760px;margin:auto;animation:slideUp .3s ease;overflow:hidden}
+@keyframes slideUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+
+.modal-head{padding:28px 32px;border-bottom:1px solid #1a1a1a;background:#111;display:flex;align-items:flex-start;justify-content:space-between;gap:16px}
+.modal-head-left{display:flex;flex-direction:column;gap:6px}
+.modal-head-title{font-size:22px;font-weight:800;color:white}
+.modal-head-meta{font-size:14px;color:#888;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.modal-close{width:36px;height:36px;background:#1a1a1a;border:1px solid #2a2a2a;border-radius:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#888;font-size:18px;transition:all .2s;flex-shrink:0}
+.modal-close:hover{background:#2a2a2a;color:white}
+
+.modal-score-banner{padding:24px 32px;background:linear-gradient(135deg,rgba(39,31,164,.2),rgba(59,130,246,.1));border-bottom:1px solid #1a1a1a;display:flex;align-items:center;gap:32px}
+.big-score{font-size:56px;font-weight:900;color:#3b82f6}
+.score-detail{flex:1}
+.score-detail h3{font-size:18px;font-weight:700;color:white;margin-bottom:4px}
+.score-detail p{font-size:14px;color:#888}
+.score-badges{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap}
+.score-badge{padding:4px 12px;border-radius:20px;font-size:12px;font-weight:700}
+.badge-green{background:#14532d;color:#86efac}
+.badge-yellow{background:#78350f;color:#fcd34d}
+.badge-red{background:#7f1d1d;color:#fca5a5}
+
+.modal-body{padding:28px 32px;display:flex;flex-direction:column;gap:20px;max-height:55vh;overflow-y:auto}
+.modal-body::-webkit-scrollbar{width:4px}
+.modal-body::-webkit-scrollbar-track{background:#1a1a1a}
+.modal-body::-webkit-scrollbar-thumb{background:#2a2a2a;border-radius:4px}
+
+.qa-item{background:#1a1a1a;border:1px solid #2a2a2a;border-radius:16px;overflow:hidden}
+.qa-header{padding:16px 20px;display:flex;align-items:flex-start;gap:14px;cursor:pointer}
+.qa-num{width:28px;height:28px;background:rgba(59,130,246,.2);color:#3b82f6;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0}
+.qa-question{flex:1;font-size:15px;font-weight:600;color:white;line-height:1.4}
+.qa-score-pill{padding:3px 10px;border-radius:20px;font-size:12px;font-weight:700;flex-shrink:0}
+.qa-chevron{width:18px;height:18px;stroke:#555;fill:none;stroke-width:1.5;flex-shrink:0;transition:transform .2s;margin-top:2px}
+.qa-item.open .qa-chevron{transform:rotate(180deg)}
+
+.qa-body{padding:0 20px 18px;display:none}
+.qa-item.open .qa-body{display:block}
+.qa-answer-label{font-size:11px;color:#555;letter-spacing:1px;margin-bottom:6px;margin-top:4px}
+.qa-answer-text{color:#ccc;font-size:14px;line-height:1.7;margin-bottom:14px}
+.qa-feedback-box{background:#111;border-left:3px solid #3b82f6;border-radius:0 8px 8px 0;padding:12px 16px}
+.qa-feedback-label{font-size:11px;color:#3b82f6;letter-spacing:1px;margin-bottom:6px}
+.qa-feedback-text{font-size:13px;color:#94a3b8;line-height:1.6}
+
+.modal-footer{padding:20px 32px;border-top:1px solid #1a1a1a;display:flex;gap:12px}
+.btn-primary{flex:1;padding:13px;background:linear-gradient(135deg,#271fa4,#3b82f6);border:none;border-radius:12px;color:white;font-size:15px;font-weight:700;cursor:pointer;font-family:'Outfit',sans-serif;transition:all .2s}
+.btn-primary:hover{opacity:.9}
+.btn-secondary{padding:13px 20px;background:#1a1a1a;border:1px solid #2a2a2a;border-radius:12px;color:#888;font-size:15px;font-weight:600;cursor:pointer;font-family:'Outfit',sans-serif;transition:all .2s}
+.btn-secondary:hover{border-color:#3b82f6;color:#3b82f6}
+
+/* ── PAGINATION ── */
+.pagination{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:32px}
+.page-btn{width:36px;height:36px;background:#1a1a1a;border:1px solid #2a2a2a;border-radius:10px;color:#888;font-size:14px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;font-family:'Outfit',sans-serif;transition:all .2s}
+.page-btn:hover,.page-btn.active{background:rgba(59,130,246,.2);border-color:#3b82f6;color:#3b82f6}
+.page-btn:disabled{opacity:.3;cursor:not-allowed}
+
+/* ── CLEAR BTN ── */
+.clear-btn{padding:8px 18px;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);border-radius:20px;color:#ef4444;font-size:13px;font-weight:600;cursor:pointer;font-family:'Outfit',sans-serif;transition:all .2s}
+.clear-btn:hover{background:rgba(239,68,68,.2)}
+
+@media(max-width:768px){
+  .sidebar{width:80px;padding:24px 12px}
+  .logo-text,.nav-item span,.user-info{display:none}
+  .main-content{margin-left:80px;padding:24px 20px}
+  .stats-row{grid-template-columns:repeat(2,1fr)}
+  .history-card{flex-wrap:wrap;gap:14px}
+  .modal-score-banner{flex-direction:column;gap:12px}
+}
+</style>
+</head>
+<body>
+<div class="dashboard">
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+  <div class="logo">
+    <div class="logo-icon">⚡</div>
+    <div class="logo-text">
+      <h2><span class="shadow">ShadowCoach</span><span class="ai"> AI</span></h2>
+      <p>YOUR INTERVIEW COACH</p>
+    </div>
+  </div>
+  <ul class="nav-menu">
+    <li class="nav-item" onclick="navigateTo('dashboard.html')">
+      <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2h-5v-7H9v7H4a2 2 0 0 1-2-2z"/></svg>
+      <span>Dashboard</span>
+    </li>
+    <li class="nav-item" onclick="navigateTo('resume-checker.html')">
+      <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+      <span>Resume</span>
+    </li>
+    <li class="nav-item" onclick="navigateTo('interview.html')">
+      <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      <span>Interview</span>
+    </li>
+    <li class="nav-item" onclick="navigateTo('prep-kit.html')">
+      <svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+      <span>Prep Kit</span>
+    </li>
+    <li class="nav-item active">
+      <svg viewBox="0 0 24 24"><path d="M12 8v4l3 3M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/></svg>
+      <span>History</span>
+    </li>
+  </ul>
+  <div class="user-section">
+    <div class="user-avatar" id="userAvatar">V</div>
+    <div class="user-info">
+      <div class="user-name" id="userName">vishnu</div>
+      <div class="logout-btn" onclick="logout()">Logout</div>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN CONTENT -->
+<div class="main-content">
+  <div class="page-header">
+    <h1>Interview History</h1>
+    <p>Review your past mock interviews and track your progress</p>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-label">TOTAL INTERVIEWS</div>
+      <div class="stat-value" id="statTotal">0</div>
+      <div class="stat-sub">All time sessions</div>
+      <div class="stat-icon"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">AVERAGE SCORE</div>
+      <div class="stat-value" id="statAvg">—</div>
+      <div class="stat-sub">Across all sessions</div>
+      <div class="stat-icon"><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">BEST SCORE</div>
+      <div class="stat-value" id="statBest">—</div>
+      <div class="stat-sub">Personal record</div>
+      <div class="stat-icon"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">COMPANIES TRIED</div>
+      <div class="stat-value" id="statCompanies">0</div>
+      <div class="stat-sub">Unique companies</div>
+      <div class="stat-icon"><svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg></div>
+    </div>
+  </div>
+
+  <!-- FILTERS -->
+  <div class="filters-bar">
+    <div class="search-box">
+      <svg class="search-icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="text" id="searchInput" placeholder="Search company or role..." oninput="applyFilters()">
+    </div>
+    <button class="filter-btn active" data-filter="all" onclick="setFilter('all',this)">All</button>
+    <button class="filter-btn" data-filter="Google" onclick="setFilter('Google',this)">Google</button>
+    <button class="filter-btn" data-filter="Amazon" onclick="setFilter('Amazon',this)">Amazon</button>
+    <button class="filter-btn" data-filter="Microsoft" onclick="setFilter('Microsoft',this)">Microsoft</button>
+    <button class="filter-btn" data-filter="Meta" onclick="setFilter('Meta',this)">Meta</button>
+    <button class="filter-btn" data-filter="Apple" onclick="setFilter('Apple',this)">Apple</button>
+    <button class="filter-btn" data-filter="Netflix" onclick="setFilter('Netflix',this)">Netflix</button>
+    <select class="sort-select" id="sortSelect" onchange="applyFilters()">
+      <option value="newest">Newest First</option>
+      <option value="oldest">Oldest First</option>
+      <option value="highest">Highest Score</option>
+      <option value="lowest">Lowest Score</option>
+    </select>
+    <button class="clear-btn" onclick="confirmClear()">🗑 Clear All</button>
+  </div>
+
+  <!-- LIST -->
+  <div class="history-list" id="historyList"></div>
+
+  <!-- EMPTY STATE -->
+  <div id="emptyState" style="display:none">
+    <div class="empty-state">
+      <span class="empty-icon">📋</span>
+      <h3>No interviews yet</h3>
+      <p>Complete a mock interview to see your history here</p>
+      <a class="empty-cta" href="interview.html">Start Your First Interview →</a>
+    </div>
+  </div>
+
+  <!-- PAGINATION -->
+  <div class="pagination" id="paginationBar"></div>
+</div>
+</div>
+
+<!-- DETAIL MODAL -->
+<div class="modal-overlay" id="detailModal">
+  <div class="modal-box">
+    <div class="modal-head">
+      <div class="modal-head-left">
+        <div class="modal-head-title" id="modalTitle">—</div>
+        <div class="modal-head-meta" id="modalMeta">—</div>
+      </div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-score-banner">
+      <div class="big-score" id="modalScore">—</div>
+      <div class="score-detail">
+        <h3 id="modalScoreLabel">—</h3>
+        <p id="modalScoreSub">—</p>
+        <div class="score-badges" id="modalBadges"></div>
+      </div>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeModal()">Close</button>
+      <button class="btn-primary" onclick="window.location.href='interview.html'">Practice Again →</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── NAV / AUTH ──
+const user = JSON.parse(localStorage.getItem('user') || '{}');
+const token = localStorage.getItem('token');
+document.getElementById('userName').textContent = user.name || 'vishnu';
+document.getElementById('userAvatar').textContent = (user.name || 'V').charAt(0).toUpperCase();
+function navigateTo(p){window.location.href=p}
+function logout(){localStorage.clear();window.location.href='login.html'}
+
+// ── SEED DEMO DATA if empty ──
+function seedDemo(){
+  const now = Date.now();
+  const day = 86400000;
+  return [
+    {date:new Date(now-1*day).toISOString(),company:'Google',role:'Software Engineer',score:82,answers:[
+      {question:'Tell me about yourself and why you want to work at Google.',answer:'I am a final-year CS student with strong foundations in algorithms and distributed systems. I have built several scalable web apps and contributed to open source. Google attracts me because of its engineering culture and the scale at which problems are solved.',feedback:'**Score: 80%**\n\nImprovements:\n• Add metrics to your experience (e.g., "reduced latency by 30%")\n• Mention a specific Google product you admire',score:80},
+      {question:'Describe a challenging technical project.',answer:'I built a real-time collaborative editor using WebSockets and CRDT algorithms. The challenge was handling concurrent edits without conflicts. I profiled and reduced merge time by 40% using a custom conflict resolution tree.',feedback:'**Score: 88%**\n\nExcellent! Strong use of STAR method with measurable results.',score:88},
+      {question:'How do you stay updated with latest technologies?',answer:'I follow engineering blogs like Google AI, read papers on arXiv, participate in Leetcode and Codeforces, and contribute to GitHub projects.',feedback:'**Score: 75%**\n\nImprovements:\n• Mention a specific recent technology you adopted\n• Include a concrete project where you applied new learning',score:75},
+      {question:'Tell me about a disagreement with a teammate.',answer:'During a hackathon, my teammate wanted to use REST but I felt GraphQL was better suited. We prototyped both in 2 hours, measured query performance, and agreed on GraphQL. The app won second place.',feedback:'**Score: 90%**\n\nPerfect conflict resolution example with data-driven outcome.',score:90},
+      {question:'Why do you want to work as a Software Engineer at Google specifically?',answer:'Google\'s work on large-scale infrastructure like Spanner and Bigtable inspires me. I want to work at a place where my code impacts billions of users and where engineering excellence is the norm.',feedback:'**Score: 85%**\n\nGood alignment with company values. Could mention a specific team.',score:85},
+      {question:'Where do you see yourself in 5 years?',answer:'I see myself as a senior engineer leading a small team, specialising in distributed systems. I hope to have shipped at least one product that significantly improves developer productivity.',feedback:'**Score: 72%**\n\nImprovements:\n• Tie your 5-year vision more explicitly to Google\'s roadmap',score:72},
+    ]},
+    {date:new Date(now-3*day).toISOString(),company:'Amazon',role:'SDE-2',score:74,answers:[
+      {question:'Tell me about yourself and why you want to work at Amazon.',answer:'I have 2 years of backend experience in Java and Spring Boot. Amazon appeals to me because of its leadership principles and the scale of its cloud infrastructure.',feedback:'**Score: 70%**\n\nImprovements:\n• Reference a specific LP that resonates with you',score:70},
+      {question:'Describe a challenging technical project.',answer:'I redesigned a monolith to microservices at my internship. Cut deployment time from 2 hours to 15 minutes using Docker and Jenkins pipelines.',feedback:'**Score: 85%**\n\nStrong measurable result. Consider adding team size.',score:85},
+      {question:'How do you stay updated with latest technologies?',answer:'I read AWS blogs, watch re:Invent talks and practice on AWS free tier.',feedback:'**Score: 72%**\n\nGood but add a specific recent technology you implemented.',score:72},
+      {question:'Tell me about a disagreement with a teammate.',answer:'Disagreed on database choice. Proposed a PoC with benchmarks. Team adopted my recommendation after seeing 3x throughput improvement.',feedback:'**Score: 80%**\n\nGood data-driven resolution.',score:80},
+      {question:'Why do you want to work as a SDE-2 at Amazon specifically?',answer:'Amazon\'s ownership culture aligns with my working style. I want to build products that directly reach customers at global scale.',feedback:'**Score: 68%**\n\nMention a specific Amazon product or service.',score:68},
+      {question:'Where do you see yourself in 5 years?',answer:'I aim to be a senior engineer owning a key service in AWS, mentoring junior engineers.',feedback:'**Score: 70%**\n\nSolid answer. Could be more specific about the domain.',score:70},
+    ]},
+    {date:new Date(now-7*day).toISOString(),company:'Microsoft',role:'Product Manager',score:91,answers:[
+      {question:'Tell me about yourself and why you want to work at Microsoft.',answer:'I have 3 years of PM experience shipping B2B SaaS products with 50k+ users. Microsoft\'s mission to empower every person on the planet resonates deeply with my own drive to build accessible tools.',feedback:'**Score: 92%**\n\nExcellent hook connecting personal values to company mission.',score:92},
+      {question:'Describe a challenging technical project.',answer:'Launched a real-time analytics dashboard that replaced 5 manual reports. Collaborated with 3 engineering teams, reduced time-to-insight from 3 days to 2 minutes, increasing stakeholder satisfaction by 40%.',feedback:'**Score: 95%**\n\nOutstanding. Quantified impact across multiple dimensions.',score:95},
+      {question:'How do you stay updated with latest technologies?',answer:'I follow Stratechery, subscribe to Lenny\'s newsletter, and participate in Product School webinars monthly.',feedback:'**Score: 88%**\n\nStrong sources. Add how you apply learnings to your work.',score:88},
+      {question:'Tell me about a disagreement with a teammate.',answer:'Engineering lead pushed back on my feature timeline. I broke the feature into phases, shipped MVP in 2 weeks and gathered user feedback before full rollout.',feedback:'**Score: 90%**\n\nGreat iterative approach. Shows empathy with engineering.',score:90},
+      {question:'Why do you want to work as a Product Manager at Microsoft specifically?',answer:'Microsoft Teams transformed remote work. I want to be part of the team building the next generation of collaboration tools that bridge digital and physical workspaces.',feedback:'**Score: 92%**\n\nVery specific and compelling.',score:92},
+      {question:'Where do you see yourself in 5 years?',answer:'Group PM leading a product area within Microsoft 365, having shipped at least two features used by millions of users daily.',feedback:'**Score: 88%**\n\nAmbitious and realistic. Strong answer.',score:88},
+    ]},
+    {date:new Date(now-14*day).toISOString(),company:'Meta',role:'Software Engineer',score:61,answers:[
+      {question:'Tell me about yourself and why you want to work at Meta.',answer:'I am a software developer. I like React and have used it for a year.',feedback:'**Score: 45%**\n\nImprovements:\n• Too brief — expand with specific projects and metrics\n• Connect your experience to Meta\'s specific products',score:45},
+      {question:'Describe a challenging technical project.',answer:'I built a blog website using React and Node.js.',feedback:'**Score: 55%**\n\nImprovements:\n• Needs a challenge/obstacle\n• No metrics or measurable outcomes\n• Use STAR format',score:55},
+      {question:'How do you stay updated with latest technologies?',answer:'I watch YouTube videos and read articles sometimes.',feedback:'**Score: 50%**\n\nImprovements:\n• Cite specific, credible sources\n• Mention applying a new technology to a real project',score:50},
+      {question:'Tell me about a disagreement with a teammate.',answer:'We disagreed on CSS approach. We just went with the senior\'s choice.',feedback:'**Score: 60%**\n\nImprovements:\n• Show your active role in resolution\n• Demonstrate a positive outcome',score:60},
+      {question:'Why do you want to work as a Software Engineer at Meta specifically?',answer:'Meta is a big company with good pay and interesting problems.',feedback:'**Score: 40%**\n\nImprovements:\n• Very generic — mention specific Meta products or values\n• Show genuine passion',score:40},
+      {question:'Where do you see yourself in 5 years?',answer:'I want to be a senior engineer somewhere.',feedback:'**Score: 55%**\n\nImprovements:\n• Tie your goal to Meta specifically\n• Be more concrete about the domain you want to master',score:55},
+    ]},
+    {date:new Date(now-21*day).toISOString(),company:'Netflix',role:'Senior Engineer',score:78,answers:[
+      {question:'Tell me about yourself and why you want to work at Netflix.',answer:'I am a senior backend engineer with 5 years of experience in high-throughput streaming systems. Netflix\'s culture of freedom and responsibility and the engineering challenge of serving 250M+ users are huge draws for me.',feedback:'**Score: 85%**\n\nGreat connection to Netflix culture. Add a specific technical challenge Netflix faces.',score:85},
+      {question:'Describe a challenging technical project.',answer:'Built a video ingestion pipeline processing 10k videos/day with 99.95% uptime using Kafka and Flink. Reduced processing latency from 8 minutes to 45 seconds.',feedback:'**Score: 90%**\n\nOutstanding measurable impact relevant to Netflix\'s domain.',score:90},
+      {question:'How do you stay updated with latest technologies?',answer:'I follow the Netflix Tech Blog, attend QCon, and contribute to Apache Kafka.',feedback:'**Score: 82%**\n\nVery relevant sources for Netflix.',score:82},
+      {question:'Tell me about a disagreement with a teammate.',answer:'Disagreed on caching strategy. Ran load tests on both approaches, chose Redis over Memcached based on data, reducing cache misses by 25%.',feedback:'**Score: 78%**\n\nGood data-driven decision. Could elaborate on team dynamics.',score:78},
+      {question:'Why do you want to work as a Senior Engineer at Netflix specifically?',answer:'Netflix\'s Chaos Engineering practices and microservices at scale are world-class. I want to contribute to Zuul or the streaming infrastructure.',feedback:'**Score: 80%**\n\nSpecific and impressive. Shows deep company knowledge.',score:80},
+      {question:'Where do you see yourself in 5 years?',answer:'Principal engineer specialising in distributed streaming systems, with published work on resilience patterns at scale.',feedback:'**Score: 55%**\n\nGood ambition but could better connect to Netflix\'s specific engineering roadmap.',score:55},
+    ]},
+  ];
+}
+
+// ── STATE ──
+let allHistory = [];
+let filtered   = [];
+let currentFilter = 'all';
+let currentPage   = 1;
+const PER_PAGE    = 6;
+
+// ── LOAD ──
+function loadHistory(){
+  let raw = JSON.parse(localStorage.getItem('interviewHistory') || '[]');
+  if(raw.length === 0){
+    raw = seedDemo();
+    localStorage.setItem('interviewHistory', JSON.stringify(raw));
+  }
+  allHistory = raw;
+  updateStats();
+  applyFilters();
+}
+
+function updateStats(){
+  const total = allHistory.length;
+  document.getElementById('statTotal').textContent = total;
+  if(total === 0){
+    document.getElementById('statAvg').textContent = '—';
+    document.getElementById('statBest').textContent = '—';
+    document.getElementById('statCompanies').textContent = '0';
+    return;
+  }
+  const avg  = Math.round(allHistory.reduce((s,h)=>s+(h.score||0),0)/total);
+  const best = Math.max(...allHistory.map(h=>h.score||0));
+  const companies = new Set(allHistory.map(h=>h.company)).size;
+  document.getElementById('statAvg').textContent  = avg+'%';
+  document.getElementById('statBest').textContent = best+'%';
+  document.getElementById('statCompanies').textContent = companies;
+}
+
+// ── FILTER / SORT ──
+function setFilter(f, btn){
+  currentFilter = f;
+  currentPage   = 1;
+  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  applyFilters();
+}
+
+function applyFilters(){
+  const q    = document.getElementById('searchInput').value.toLowerCase();
+  const sort = document.getElementById('sortSelect').value;
+  filtered = allHistory.filter(h=>{
+    const matchFilter = currentFilter==='all' || h.company===currentFilter;
+    const matchSearch = !q || h.company.toLowerCase().includes(q) || (h.role||'').toLowerCase().includes(q);
+    return matchFilter && matchSearch;
+  });
+  if(sort==='newest') filtered.sort((a,b)=>new Date(b.date)-new Date(a.date));
+  else if(sort==='oldest') filtered.sort((a,b)=>new Date(a.date)-new Date(b.date));
+  else if(sort==='highest') filtered.sort((a,b)=>(b.score||0)-(a.score||0));
+  else if(sort==='lowest') filtered.sort((a,b)=>(a.score||0)-(b.score||0));
+  currentPage = 1;
+  render();
+}
+
+// ── RENDER ──
+const companyColors={Google:'#4285F4',Amazon:'#FF9900',Microsoft:'#00A4EF',Meta:'#0064E0',Apple:'#94a3b8',Netflix:'#E50914'};
+const companyEmoji={Google:'G',Amazon:'A',Microsoft:'M',Meta:'M',Apple:'🍎',Netflix:'N'};
+
+function scoreColor(s){return s>=80?'#22c55e':s>=60?'#f59e0b':'#ef4444'}
+function scoreBadgeClass(s){return s>=80?'badge-green':s>=60?'badge-yellow':'badge-red'}
+function scoreMsg(s){return s>=85?'Outstanding 🎉':s>=70?'Good Performance 👍':s>=55?'Needs Improvement':'Keep Practicing 💪'}
+
+function buildRing(score){
+  const r=26,cx=32,cy=32,circ=2*Math.PI*r;
+  const dash=circ*score/100;
+  const c=scoreColor(score);
+  return `<svg width="64" height="64" viewBox="0 0 64 64">
+    <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="#1a1a1a" stroke-width="5"/>
+    <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${c}" stroke-width="5"
+      stroke-dasharray="${dash} ${circ}" stroke-linecap="round"/>
+  </svg>`;
+}
+
+function formatDate(iso){
+  const d=new Date(iso);
+  const now=new Date();
+  const diff=Math.floor((now-d)/86400000);
+  if(diff===0) return 'Today';
+  if(diff===1) return 'Yesterday';
+  if(diff<7)   return diff+' days ago';
+  return d.toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'});
+}
+
+function render(){
+  const list = document.getElementById('historyList');
+  const empty= document.getElementById('emptyState');
+  if(filtered.length===0){
+    list.innerHTML='';
+    empty.style.display='block';
+    document.getElementById('paginationBar').innerHTML='';
+    return;
+  }
+  empty.style.display='none';
+  const start=(currentPage-1)*PER_PAGE, end=start+PER_PAGE;
+  const page=filtered.slice(start,end);
+  list.innerHTML = page.map((h,i)=>{
+    const idx=start+i;
+    const score=h.score||0;
+    const color=companyColors[h.company]||'#3b82f6';
+    return `<div class="history-card" onclick="openDetail(${idx})">
+      <div class="card-company-badge" style="border-color:${color}22">
+        <span style="color:${color};font-weight:800;font-size:16px">${(h.company||'?').charAt(0)}</span>
+      </div>
+      <div class="card-info">
+        <div class="card-row1">
+          <span class="card-company-name">${h.company}</span>
+        </div>
+        <div class="card-role">${h.role||'Software Engineer'}</div>
+        <div class="card-date">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          ${formatDate(h.date)}
+        </div>
+      </div>
+      <div class="card-tags">
+        <span class="card-tag">${(h.answers||[]).length} Questions</span>
+        <span class="card-tag" style="border-color:${scoreColor(score)}33;color:${scoreColor(score)}">${score>=80?'Strong':score>=60?'Average':'Needs Work'}</span>
+      </div>
+      <div class="card-score-block">
+        <div class="score-ring">
+          ${buildRing(score)}
+          <div class="score-ring-text">${score}%</div>
+        </div>
+        <div class="score-label">Score</div>
+      </div>
+      <svg class="card-chevron" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+    </div>`;
+  }).join('');
+  renderPagination();
+}
+
+function renderPagination(){
+  const totalPages=Math.ceil(filtered.length/PER_PAGE);
+  if(totalPages<=1){document.getElementById('paginationBar').innerHTML='';return}
+  let html='';
+  html+=`<button class="page-btn" onclick="goPage(${currentPage-1})" ${currentPage===1?'disabled':''}>‹</button>`;
+  for(let p=1;p<=totalPages;p++){
+    html+=`<button class="page-btn${p===currentPage?' active':''}" onclick="goPage(${p})">${p}</button>`;
+  }
+  html+=`<button class="page-btn" onclick="goPage(${currentPage+1})" ${currentPage===totalPages?'disabled':''}>›</button>`;
+  document.getElementById('paginationBar').innerHTML=html;
+}
+function goPage(p){currentPage=p;render();window.scrollTo({top:0,behavior:'smooth'})}
+
+// ── DETAIL MODAL ──
+function openDetail(idx){
+  const h=filtered[idx];
+  document.getElementById('modalTitle').textContent=`${h.company} — ${h.role||'Software Engineer'}`;
+  document.getElementById('modalMeta').innerHTML=`
+    <span>📅 ${new Date(h.date).toLocaleDateString('en-IN',{weekday:'short',day:'numeric',month:'long',year:'numeric'})}</span>
+    <span>❓ ${(h.answers||[]).length} Questions</span>
+  `;
+  const score=h.score||0;
+  document.getElementById('modalScore').textContent=score+'%';
+  document.getElementById('modalScore').style.color=scoreColor(score);
+  document.getElementById('modalScoreLabel').textContent=scoreMsg(score);
+  document.getElementById('modalScoreSub').textContent=`${score>=70?'You performed well':'Review the feedback below'} in your ${h.company} ${h.role||''} mock interview`;
+
+  const answers=h.answers||[];
+  const good=answers.filter(a=>(a.score||0)>=70).length;
+  const bad=answers.filter(a=>(a.score||0)<70).length;
+  document.getElementById('modalBadges').innerHTML=
+    `<span class="score-badge badge-green">${good} Strong Answers</span>`+
+    (bad?`<span class="score-badge badge-red">${bad} Need Work</span>`:'');
+
+  document.getElementById('modalBody').innerHTML = answers.map((a,i)=>{
+    const sc=a.score||0;
+    const cls=scoreBadgeClass(sc);
+    const fb=(a.feedback||'No feedback available').replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br>').replace(/• /g,'• ');
+    return `<div class="qa-item" id="qaItem${i}">
+      <div class="qa-header" onclick="toggleQA(${i})">
+        <div class="qa-num">${i+1}</div>
+        <div class="qa-question">${a.question}</div>
+        <span class="qa-score-pill ${cls}">${sc}%</span>
+        <svg class="qa-chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+      <div class="qa-body">
+        <div class="qa-answer-label">YOUR ANSWER</div>
+        <div class="qa-answer-text">${a.answer||'No answer recorded'}</div>
+        <div class="qa-feedback-box">
+          <div class="qa-feedback-label">🤖 AI FEEDBACK</div>
+          <div class="qa-feedback-text">${fb}</div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+
+  document.getElementById('detailModal').classList.add('show');
+  document.body.style.overflow='hidden';
+}
+function toggleQA(i){
+  const el=document.getElementById('qaItem'+i);
+  el.classList.toggle('open');
+}
+function closeModal(){
+  document.getElementById('detailModal').classList.remove('show');
+  document.body.style.overflow='';
+}
+document.getElementById('detailModal').addEventListener('click',e=>{
+  if(e.target===document.getElementById('detailModal'))closeModal();
+});
+
+// ── CLEAR ──
+function confirmClear(){
+  if(!allHistory.length){alert('No history to clear.');return}
+  if(confirm('Are you sure you want to delete all interview history? This cannot be undone.')){
+    localStorage.removeItem('interviewHistory');
+    localStorage.removeItem('stats');
+    allHistory=[];filtered=[];
+    updateStats();
+    render();
+  }
+}
+
+// ── INIT ──
+loadHistory();
+</script>
+</body>
+</html>

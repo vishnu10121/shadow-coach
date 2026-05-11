@@ -1,0 +1,882 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ShadowCoach AI - Preparation Kit</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Outfit',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#0a0a0a;min-height:100vh;color:white}
+.dashboard{display:flex;min-height:100vh}
+
+/* ── SIDEBAR ── */
+.sidebar{width:280px;background:#0f0f0f;border-right:1px solid #1a1a1a;padding:32px 24px;position:fixed;height:100vh;overflow-y:auto}
+.logo{display:flex;align-items:center;gap:12px;margin-bottom:48px}
+.logo-icon{width:44px;height:44px;background:linear-gradient(135deg,#271fa4 0%,#3b82f6 100%);border-radius:12px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:18px;color:white}
+.logo-text h2{font-size:20px;font-weight:800;letter-spacing:-.5px}
+.logo-text h2 .shadow{background:linear-gradient(135deg,#fff 0%,#94a3b8 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.logo-text h2 .ai{color:#3b82f6}
+.logo-text p{font-size:9px;color:#3b82f6;letter-spacing:1.5px;font-weight:600;margin-top:2px}
+.nav-menu{list-style:none;margin-top:8px}
+.nav-item{display:flex;align-items:center;gap:14px;padding:14px 16px;margin:4px 0;border-radius:12px;cursor:pointer;transition:all .3s;color:#888;font-weight:500;font-size:16px}
+.nav-item svg{width:22px;height:22px;stroke:#888;stroke-width:1.5;fill:none;flex-shrink:0}
+.nav-item:hover,.nav-item.active{background:#1a1a1a;color:white}
+.nav-item:hover svg,.nav-item.active svg{stroke:#3b82f6}
+.user-section{position:absolute;bottom:32px;left:24px;right:24px;padding:16px;background:#1a1a1a;border-radius:16px;display:flex;align-items:center;gap:12px;border:1px solid #2a2a2a}
+.user-avatar{width:44px;height:44px;background:linear-gradient(135deg,#271fa4 0%,#3b82f6 100%);border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:18px;color:white;flex-shrink:0}
+.user-info{flex:1}
+.user-name{font-weight:700;color:white;font-size:16px}
+.logout-btn{font-size:13px;color:#888;cursor:pointer;transition:color .3s}
+.logout-btn:hover{color:#ef4444}
+
+/* ── MAIN CONTENT ── */
+.main-content{flex:1;margin-left:280px;min-height:100vh;display:flex;flex-direction:column}
+.page-header{padding:32px 48px 0}
+.page-header h1{font-size:36px;font-weight:700;color:white;margin-bottom:8px}
+.page-header p{font-size:16px;color:#888}
+
+/* ── TABS ── */
+.tabs{display:flex;gap:4px;margin:24px 48px 0;border-bottom:1px solid #1a1a1a;padding-bottom:0}
+.tab-btn{display:flex;align-items:center;gap:8px;padding:12px 20px;border:none;background:none;color:#888;font-size:15px;font-weight:500;cursor:pointer;font-family:'Outfit',sans-serif;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .2s}
+.tab-btn svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:1.5}
+.tab-btn.active{color:white;border-bottom-color:#3b82f6;background:#1a1a1a;border-radius:8px 8px 0 0}
+.tab-btn:hover:not(.active){color:#ccc}
+
+/* ── COMPANIES GRID ── */
+.prep-content{padding:32px 48px 48px}
+.companies-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+
+.company-prep-card{background:#0f0f0f;border:1px solid #1e1e1e;border-radius:20px;padding:28px;display:flex;flex-direction:column;gap:16px;transition:all .3s;cursor:pointer;position:relative;overflow:hidden}
+.company-prep-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,#3b82f6,transparent);opacity:0;transition:opacity .3s}
+.company-prep-card:hover{border-color:#2a2a2a;transform:translateY(-3px);box-shadow:0 12px 40px rgba(0,0,0,.4)}
+.company-prep-card:hover::before{opacity:1}
+
+.card-top{display:flex;justify-content:space-between;align-items:flex-start}
+.company-logo-area{height:36px;display:flex;align-items:center}
+.diff-badge{padding:4px 12px;border-radius:20px;font-size:12px;font-weight:700;letter-spacing:.5px}
+.diff-badge.hard{background:#7f1d1d;color:#fca5a5}
+.diff-badge.medium-hard{background:#78350f;color:#fcd34d}
+.diff-badge.very-hard{background:#4c1d95;color:#c4b5fd}
+
+.card-company-name{font-size:22px;font-weight:700;color:white}
+.card-meta{display:flex;flex-direction:column;gap:8px}
+.meta-row{display:flex;align-items:center;gap:8px;color:#888;font-size:14px}
+.meta-row svg{width:16px;height:16px;stroke:#888;fill:none;stroke-width:1.5;flex-shrink:0}
+.focus-tags{display:flex;flex-wrap:wrap;gap:8px}
+.focus-tag{padding:4px 12px;background:#1a1a1a;border:1px solid #2a2a2a;border-radius:20px;font-size:12px;color:#aaa;font-weight:500}
+
+.start-prep-btn{width:100%;padding:14px;background:linear-gradient(135deg,#271fa4 0%,#3b82f6 100%);color:white;border:none;border-radius:12px;font-size:16px;font-weight:700;cursor:pointer;font-family:'Outfit',sans-serif;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .3s;margin-top:auto}
+.start-prep-btn:hover{opacity:.9;transform:translateY(-1px);box-shadow:0 4px 20px rgba(59,130,246,.3)}
+
+/* ── SUCCESS STORIES ── */
+.stories-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.story-card{background:#0f0f0f;border:1px solid #1e1e1e;border-radius:20px;padding:28px;display:flex;flex-direction:column;gap:16px}
+.story-person{display:flex;align-items:center;gap:14px}
+.story-avatar{width:52px;height:52px;border-radius:50%;object-fit:cover;background:linear-gradient(135deg,#271fa4,#3b82f6);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:20px;color:white;flex-shrink:0}
+.story-person-info h3{font-size:16px;font-weight:700;color:white}
+.story-person-info p{font-size:13px;color:#888;margin-top:2px}
+.story-company-logo{height:24px}
+.story-quote{color:#ccc;font-size:15px;line-height:1.7;font-style:italic;position:relative;padding-left:20px}
+.story-quote::before{content:'"';position:absolute;left:0;top:-4px;font-size:40px;color:#3b82f6;font-family:Georgia,serif;line-height:1}
+
+/* ── PREP MODAL OVERLAY ── */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.85);backdrop-filter:blur(8px);z-index:1000;display:none;align-items:flex-start;justify-content:center;padding:20px;overflow-y:auto}
+.modal-overlay.show{display:flex}
+.modal-box{background:#0f0f0f;border:1px solid #2a2a2a;border-radius:24px;width:100%;max-width:960px;margin:auto;overflow:hidden;animation:slideUp .3s ease}
+@keyframes slideUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+
+.modal-header{padding:24px 32px;border-bottom:1px solid #1a1a1a;display:flex;align-items:center;justify-content:space-between;background:#111}
+.modal-header h2{font-size:22px;font-weight:700;color:white}
+.modal-header p{font-size:14px;color:#888;margin-top:4px}
+.modal-close{width:36px;height:36px;background:#1a1a1a;border:1px solid #2a2a2a;border-radius:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#888;font-size:18px;transition:all .2s}
+.modal-close:hover{background:#2a2a2a;color:white}
+
+.modal-tabs{display:flex;border-bottom:1px solid #1a1a1a;background:#111}
+.modal-tab{flex:1;padding:16px;text-align:center;cursor:pointer;font-size:15px;font-weight:600;color:#888;border:none;background:none;font-family:'Outfit',sans-serif;transition:all .2s;border-bottom:2px solid transparent}
+.modal-tab.active{color:#3b82f6;border-bottom-color:#3b82f6;background:#0f0f0f}
+.modal-body{padding:32px;display:none}
+.modal-body.active{display:block}
+
+/* ── DSA SECTION ── */
+.dsa-layout{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+.problem-panel{display:flex;flex-direction:column;gap:16px}
+.problem-selector{display:flex;gap:8px;flex-wrap:wrap}
+.prob-chip{padding:6px 14px;background:#1a1a1a;border:1px solid #2a2a2a;border-radius:20px;font-size:13px;color:#888;cursor:pointer;transition:all .2s;font-family:'Outfit',sans-serif}
+.prob-chip.active,.prob-chip:hover{background:rgba(59,130,246,.15);border-color:#3b82f6;color:#3b82f6}
+.problem-box{background:#1a1a1a;border:1px solid #2a2a2a;border-radius:16px;padding:20px;flex:1}
+.problem-box h3{font-size:16px;font-weight:700;color:white;margin-bottom:8px}
+.difficulty-label{display:inline-block;padding:2px 10px;border-radius:20px;font-size:11px;font-weight:700;margin-bottom:12px}
+.difficulty-label.easy{background:#14532d;color:#86efac}
+.difficulty-label.medium{background:#78350f;color:#fcd34d}
+.difficulty-label.hard2{background:#7f1d1d;color:#fca5a5}
+.problem-desc{color:#ccc;font-size:14px;line-height:1.7}
+.problem-examples{margin-top:12px}
+.example{background:#111;border-radius:8px;padding:12px;margin-top:8px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#94a3b8}
+.example strong{color:#3b82f6}
+
+.editor-panel{display:flex;flex-direction:column;gap:12px}
+.editor-controls{display:flex;align-items:center;justify-content:space-between}
+.lang-select{padding:8px 14px;background:#1a1a1a;border:1px solid #2a2a2a;border-radius:10px;color:white;font-size:14px;font-family:'Outfit',sans-serif;cursor:pointer}
+.lang-select:focus{outline:none;border-color:#3b82f6}
+.run-btn{padding:8px 20px;background:linear-gradient(135deg,#271fa4,#3b82f6);border:none;border-radius:10px;color:white;font-size:14px;font-weight:700;cursor:pointer;font-family:'Outfit',sans-serif;display:flex;align-items:center;gap:8px;transition:all .2s}
+.run-btn:hover{opacity:.9}
+.run-btn svg{width:16px;height:16px;fill:white}
+.code-editor{background:#111;border:1px solid #2a2a2a;border-radius:14px;overflow:hidden;flex:1;display:flex;flex-direction:column}
+.editor-header{padding:10px 16px;border-bottom:1px solid #1a1a1a;display:flex;align-items:center;gap:8px}
+.dot{width:12px;height:12px;border-radius:50%}
+.dot-red{background:#ef4444}
+.dot-yellow{background:#f59e0b}
+.dot-green{background:#22c55e}
+.code-area{width:100%;min-height:200px;background:transparent;border:none;resize:none;color:#e2e8f0;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.7;padding:16px;outline:none}
+.output-area{background:#0a0a0a;border-top:1px solid #1a1a1a;padding:14px 16px;min-height:80px;max-height:150px;overflow-y:auto}
+.output-label{font-size:11px;color:#555;letter-spacing:1px;margin-bottom:6px;font-family:'JetBrains Mono',monospace}
+.output-text{font-family:'JetBrains Mono',monospace;font-size:13px;color:#86efac;white-space:pre-wrap}
+.output-text.error{color:#fca5a5}
+
+/* ── MCQ SECTION ── */
+.mcq-header-bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px}
+.mcq-header-bar h3{font-size:18px;font-weight:700;color:white}
+.mcq-progress{font-size:13px;color:#888}
+.mcq-question{background:#1a1a1a;border:1px solid #2a2a2a;border-radius:16px;padding:24px;margin-bottom:16px}
+.mcq-q-text{font-size:15px;color:white;font-weight:600;margin-bottom:16px;line-height:1.5}
+.mcq-q-num{display:inline-block;background:rgba(59,130,246,.2);color:#3b82f6;width:28px;height:28px;border-radius:8px;text-align:center;line-height:28px;font-size:13px;font-weight:700;margin-right:10px;flex-shrink:0}
+.mcq-options{display:flex;flex-direction:column;gap:10px}
+.mcq-option{display:flex;align-items:center;gap:12px;padding:12px 16px;background:#111;border:1px solid #2a2a2a;border-radius:12px;cursor:pointer;transition:all .2s}
+.mcq-option:hover{border-color:#3b82f6;background:rgba(59,130,246,.08)}
+.mcq-option.selected{border-color:#3b82f6;background:rgba(59,130,246,.15)}
+.mcq-option.correct{border-color:#22c55e;background:rgba(34,197,94,.12)}
+.mcq-option.wrong{border-color:#ef4444;background:rgba(239,68,68,.12)}
+.option-letter{width:28px;height:28px;border-radius:8px;background:#1a1a1a;border:1px solid #333;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#888;flex-shrink:0;transition:all .2s}
+.mcq-option.selected .option-letter{background:#3b82f6;border-color:#3b82f6;color:white}
+.mcq-option.correct .option-letter{background:#22c55e;border-color:#22c55e;color:white}
+.mcq-option.wrong .option-letter{background:#ef4444;border-color:#ef4444;color:white}
+.option-text{font-size:14px;color:#ccc}
+.submit-mcq-btn{width:100%;padding:16px;background:linear-gradient(135deg,#271fa4,#3b82f6);border:none;border-radius:14px;color:white;font-size:17px;font-weight:700;cursor:pointer;font-family:'Outfit',sans-serif;margin-top:8px;transition:all .2s}
+.submit-mcq-btn:hover{opacity:.9;transform:translateY(-1px)}
+.mcq-result{background:#1a1a1a;border-radius:16px;padding:28px;text-align:center;margin-top:16px;display:none}
+.mcq-result.show{display:block}
+.result-score{font-size:56px;font-weight:900;color:#3b82f6;margin-bottom:8px}
+.result-label{font-size:18px;font-weight:600;color:white;margin-bottom:8px}
+.result-sub{font-size:14px;color:#888;margin-bottom:20px}
+.retry-btn{padding:12px 28px;background:#1a1a1a;border:1px solid #3b82f6;border-radius:40px;color:#3b82f6;font-size:15px;font-weight:600;cursor:pointer;font-family:'Outfit',sans-serif;transition:all .2s}
+.retry-btn:hover{background:rgba(59,130,246,.1)}
+
+/* SVG LOGOS */
+.google-logo{font-weight:700;font-size:22px;letter-spacing:-.5px}
+.g-b{color:#4285F4}.g-r{color:#EA4335}.g-y{color:#FBBC05}.g-g{color:#34A853}
+.amazon-logo{color:#FF9900;font-weight:900;font-size:20px;letter-spacing:-1px}
+.amazon-arrow{color:#FF9900;font-size:10px}
+.ms-grid{display:grid;grid-template-columns:1fr 1fr;gap:2px;width:28px;height:28px}
+.ms-cell{border-radius:1px}
+.meta-color{color:#0064e1;font-weight:800;font-size:18px}
+.apple-svg{width:28px;height:34px}
+.netflix-logo{color:#E50914;font-weight:900;font-size:22px;letter-spacing:2px}
+
+@media(max-width:900px){
+  .dsa-layout{grid-template-columns:1fr}
+  .companies-grid,.stories-grid{grid-template-columns:repeat(2,1fr)}
+}
+@media(max-width:768px){
+  .sidebar{width:80px;padding:24px 12px}
+  .logo-text,.nav-item span,.user-info{display:none}
+  .main-content{margin-left:80px}
+  .prep-content,.page-header{padding:20px 24px}
+  .companies-grid,.stories-grid{grid-template-columns:1fr}
+  .tabs{margin:16px 24px 0}
+  .modal-overlay{padding:10px}
+}
+</style>
+</head>
+<body>
+<div class="dashboard">
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+  <div class="logo">
+    <div class="logo-icon">⚡</div>
+    <div class="logo-text">
+      <h2><span class="shadow">ShadowCoach</span><span class="ai"> AI</span></h2>
+      <p>YOUR INTERVIEW COACH</p>
+    </div>
+  </div>
+  <ul class="nav-menu">
+    <li class="nav-item" onclick="navigateTo('dashboard.html')">
+      <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2h-5v-7H9v7H4a2 2 0 0 1-2-2z"/></svg>
+      <span>Dashboard</span>
+    </li>
+    <li class="nav-item" onclick="navigateTo('resume-checker.html')">
+      <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+      <span>Resume</span>
+    </li>
+    <li class="nav-item" onclick="navigateTo('interview.html')">
+      <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      <span>Interview</span>
+    </li>
+    <li class="nav-item active">
+      <svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+      <span>Prep Kit</span>
+    </li>
+    <li class="nav-item" onclick="navigateTo('history.html')">
+      <svg viewBox="0 0 24 24"><path d="M12 8v4l3 3M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/></svg>
+      <span>History</span>
+    </li>
+  </ul>
+  <div class="user-section">
+    <div class="user-avatar" id="userAvatar">V</div>
+    <div class="user-info">
+      <div class="user-name" id="userName">vishnu</div>
+      <div class="logout-btn" onclick="logout()">Logout</div>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN CONTENT -->
+<div class="main-content">
+  <div class="page-header">
+    <h1>Preparation Kit</h1>
+    <p>Company-specific resources and interview preparation materials</p>
+  </div>
+
+  <!-- TABS -->
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab('companies')">
+      <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+      Companies
+    </button>
+    <button class="tab-btn" onclick="switchTab('stories')">
+      <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+      Success Stories
+    </button>
+  </div>
+
+  <!-- COMPANIES TAB -->
+  <div class="prep-content" id="tab-companies">
+    <div class="companies-grid">
+
+      <!-- GOOGLE -->
+      <div class="company-prep-card">
+        <div class="card-top">
+          <div class="company-logo-area">
+            <span class="google-logo"><span class="g-b">G</span><span class="g-r">o</span><span class="g-y">o</span><span class="g-g">g</span><span class="g-b">l</span><span class="g-r">e</span></span>
+          </div>
+          <span class="diff-badge hard">Hard</span>
+        </div>
+        <div class="card-company-name">Google</div>
+        <div class="card-meta">
+          <div class="meta-row">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            Prep time: 3-4 months
+          </div>
+          <div class="meta-row">
+            <svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+            3 focus areas
+          </div>
+          <div class="focus-tags">
+            <span class="focus-tag">DSA</span>
+            <span class="focus-tag">System Design</span>
+            <span class="focus-tag">Behavioral</span>
+          </div>
+        </div>
+        <button class="start-prep-btn" onclick="openPrep('Google')">Start Preparation →</button>
+      </div>
+
+      <!-- AMAZON -->
+      <div class="company-prep-card">
+        <div class="card-top">
+          <div class="company-logo-area">
+            <span class="amazon-logo">amazon</span>
+          </div>
+          <span class="diff-badge hard">Hard</span>
+        </div>
+        <div class="card-company-name">Amazon</div>
+        <div class="card-meta">
+          <div class="meta-row">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            Prep time: 2-3 months
+          </div>
+          <div class="meta-row">
+            <svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+            3 focus areas
+          </div>
+          <div class="focus-tags">
+            <span class="focus-tag">Leadership Principles</span>
+            <span class="focus-tag">DSA</span>
+            <span class="focus-tag">System Design</span>
+          </div>
+        </div>
+        <button class="start-prep-btn" onclick="openPrep('Amazon')">Start Preparation →</button>
+      </div>
+
+      <!-- MICROSOFT -->
+      <div class="company-prep-card">
+        <div class="card-top">
+          <div class="company-logo-area">
+            <div style="display:flex;align-items:center;gap:8px">
+              <div class="ms-grid">
+                <div class="ms-cell" style="background:#F25022"></div>
+                <div class="ms-cell" style="background:#7FBA00"></div>
+                <div class="ms-cell" style="background:#00A4EF"></div>
+                <div class="ms-cell" style="background:#FFB900"></div>
+              </div>
+              <span style="font-size:20px;font-weight:700;color:white">Microsoft</span>
+            </div>
+          </div>
+          <span class="diff-badge medium-hard">Medium-Hard</span>
+        </div>
+        <div class="card-company-name">Microsoft</div>
+        <div class="card-meta">
+          <div class="meta-row">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            Prep time: 2-3 months
+          </div>
+          <div class="meta-row">
+            <svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+            3 focus areas
+          </div>
+          <div class="focus-tags">
+            <span class="focus-tag">DSA</span>
+            <span class="focus-tag">System Design</span>
+            <span class="focus-tag">Problem Solving</span>
+          </div>
+        </div>
+        <button class="start-prep-btn" onclick="openPrep('Microsoft')">Start Preparation →</button>
+      </div>
+
+      <!-- META -->
+      <div class="company-prep-card">
+        <div class="card-top">
+          <div class="company-logo-area">
+            <div style="display:flex;align-items:center;gap:8px">
+              <svg width="30" height="30" viewBox="0 0 30 30"><path d="M15 4C9.477 4 5 8.477 5 14s4.477 10 10 10 10-4.477 10-10S20.523 4 15 4zm5.7 7.2c-.3-.9-1.1-1.5-2-1.5-.6 0-1.1.2-1.5.6-.4.4-.6.9-.6 1.4 0 .2 0 .4.1.6h-3.4c.1-.2.1-.4.1-.6 0-.5-.2-1-.6-1.4-.4-.4-.9-.6-1.5-.6-.9 0-1.7.6-2 1.5-.1.4-.2.8-.2 1.2 0 2.4 1.6 4.9 4.7 7.4C16.5 17.3 18 14.8 18 12.4c0-.4 0-.8-.3-1.2z" fill="#0064E0"/></svg>
+              <span class="meta-color">Meta</span>
+            </div>
+          </div>
+          <span class="diff-badge hard">Hard</span>
+        </div>
+        <div class="card-company-name">Meta</div>
+        <div class="card-meta">
+          <div class="meta-row">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            Prep time: 3-4 months
+          </div>
+          <div class="meta-row">
+            <svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+            3 focus areas
+          </div>
+          <div class="focus-tags">
+            <span class="focus-tag">DSA</span>
+            <span class="focus-tag">System Design</span>
+            <span class="focus-tag">Product Sense</span>
+          </div>
+        </div>
+        <button class="start-prep-btn" onclick="openPrep('Meta')">Start Preparation →</button>
+      </div>
+
+      <!-- APPLE -->
+      <div class="company-prep-card">
+        <div class="card-top">
+          <div class="company-logo-area">
+            <div style="display:flex;align-items:center;gap:10px">
+              <svg viewBox="0 0 814 1000" width="24" height="30" fill="white"><path d="M788.1 340.9c-5.8 4.5-108.2 62.2-108.2 190.5 0 148.4 130.3 200.9 134.2 202.2-.6 3.2-20.7 71.9-68.7 141.9-42.8 61.6-87.5 123.1-155.5 123.1s-85.5-39.5-164-39.5c-76 0-103.7 40.8-165.9 40.8s-105-57.8-155.5-127.4C46 436 45.8 310.5 45.8 284.3c0-253.3 165.8-387 329.3-387 87.3 0 159.9 57.5 214.8 57.5 51.9 0 133.6-60.9 232.1-60.9 35 0 127.2 3.2 195.8 81.2zm-274.3-86.3c39.1-51.9 68.4-123.2 68.4-194.5 0-9.9-.7-20.1-2.5-28.7-64.2 2.5-140.1 43-185.9 99.4-35.7 41.4-71.2 112.5-71.2 185.1 0 11.3 2 22.5 2.8 26.1 4.5.7 11.8 1.9 18.9 1.9 57.2 0 128.8-38.3 169.5-89.3z"/></svg>
+              <span style="font-size:20px;font-weight:700;color:white">Apple</span>
+            </div>
+          </div>
+          <span class="diff-badge hard">Hard</span>
+        </div>
+        <div class="card-company-name">Apple</div>
+        <div class="card-meta">
+          <div class="meta-row">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            Prep time: 2-3 months
+          </div>
+          <div class="meta-row">
+            <svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+            3 focus areas
+          </div>
+          <div class="focus-tags">
+            <span class="focus-tag">Technical</span>
+            <span class="focus-tag">Design</span>
+            <span class="focus-tag">Behavioral</span>
+          </div>
+        </div>
+        <button class="start-prep-btn" onclick="openPrep('Apple')">Start Preparation →</button>
+      </div>
+
+      <!-- NETFLIX -->
+      <div class="company-prep-card">
+        <div class="card-top">
+          <div class="company-logo-area">
+            <span class="netflix-logo">NETFLIX</span>
+          </div>
+          <span class="diff-badge very-hard">Very Hard</span>
+        </div>
+        <div class="card-company-name">Netflix</div>
+        <div class="card-meta">
+          <div class="meta-row">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            Prep time: 3-4 months
+          </div>
+          <div class="meta-row">
+            <svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+            3 focus areas
+          </div>
+          <div class="focus-tags">
+            <span class="focus-tag">Technical</span>
+            <span class="focus-tag">Culture Fit</span>
+            <span class="focus-tag">System Design</span>
+          </div>
+        </div>
+        <button class="start-prep-btn" onclick="openPrep('Netflix')">Start Preparation →</button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- SUCCESS STORIES TAB -->
+  <div class="prep-content" id="tab-stories" style="display:none">
+    <div class="stories-grid">
+      <div class="story-card">
+        <div class="story-person">
+          <div class="story-avatar">P</div>
+          <div class="story-person-info">
+            <h3>Priya Sharma</h3>
+            <p>Software Engineer at Google</p>
+          </div>
+        </div>
+        <div style="margin:4px 0">
+          <span class="google-logo" style="font-size:18px"><span class="g-b">G</span><span class="g-r">o</span><span class="g-y">o</span><span class="g-g">g</span><span class="g-b">l</span><span class="g-r">e</span></span>
+        </div>
+        <div class="story-quote">ShadowCoach AI helped me prepare for my Google interview. The company-specific questions were incredibly accurate!</div>
+      </div>
+      <div class="story-card">
+        <div class="story-person">
+          <div class="story-avatar">R</div>
+          <div class="story-person-info">
+            <h3>Rahul Verma</h3>
+            <p>SDE-2 at Amazon</p>
+          </div>
+        </div>
+        <div style="margin:4px 0">
+          <span class="amazon-logo" style="font-size:16px">amazon</span>
+        </div>
+        <div class="story-quote">The leadership principles practice sessions were exactly what I needed. Landed my dream job!</div>
+      </div>
+      <div class="story-card">
+        <div class="story-person">
+          <div class="story-avatar">A</div>
+          <div class="story-person-info">
+            <h3>Aisha Khan</h3>
+            <p>Product Manager at Microsoft</p>
+          </div>
+        </div>
+        <div style="margin:4px 0;display:flex;align-items:center;gap:8px">
+          <div class="ms-grid" style="width:20px;height:20px">
+            <div class="ms-cell" style="background:#F25022"></div>
+            <div class="ms-cell" style="background:#7FBA00"></div>
+            <div class="ms-cell" style="background:#00A4EF"></div>
+            <div class="ms-cell" style="background:#FFB900"></div>
+          </div>
+          <span style="font-size:16px;font-weight:700;color:white">Microsoft</span>
+        </div>
+        <div class="story-quote">The AI feedback was spot-on. It helped me identify and fix weaknesses in my answers before the real interview.</div>
+      </div>
+      <div class="story-card">
+        <div class="story-person">
+          <div class="story-avatar">D</div>
+          <div class="story-person-info">
+            <h3>Divya Menon</h3>
+            <p>Senior SWE at Meta</p>
+          </div>
+        </div>
+        <div style="margin:4px 0">
+          <span class="meta-color" style="font-size:16px">Meta</span>
+        </div>
+        <div class="story-quote">Practiced over 50 DSA problems through ShadowCoach. The real-time compiler made it feel like an actual coding round.</div>
+      </div>
+      <div class="story-card">
+        <div class="story-person">
+          <div class="story-avatar">K</div>
+          <div class="story-person-info">
+            <h3>Karan Patel</h3>
+            <p>iOS Engineer at Apple</p>
+          </div>
+        </div>
+        <div style="margin:4px 0;display:flex;align-items:center;gap:8px">
+          <svg viewBox="0 0 814 1000" width="14" height="18" fill="white"><path d="M788.1 340.9c-5.8 4.5-108.2 62.2-108.2 190.5 0 148.4 130.3 200.9 134.2 202.2-.6 3.2-20.7 71.9-68.7 141.9-42.8 61.6-87.5 123.1-155.5 123.1s-85.5-39.5-164-39.5c-76 0-103.7 40.8-165.9 40.8s-105-57.8-155.5-127.4C46 436 45.8 310.5 45.8 284.3c0-253.3 165.8-387 329.3-387 87.3 0 159.9 57.5 214.8 57.5 51.9 0 133.6-60.9 232.1-60.9 35 0 127.2 3.2 195.8 81.2zm-274.3-86.3c39.1-51.9 68.4-123.2 68.4-194.5 0-9.9-.7-20.1-2.5-28.7-64.2 2.5-140.1 43-185.9 99.4-35.7 41.4-71.2 112.5-71.2 185.1 0 11.3 2 22.5 2.8 26.1 4.5.7 11.8 1.9 18.9 1.9 57.2 0 128.8-38.3 169.5-89.3z"/></svg>
+          <span style="font-size:16px;font-weight:700;color:white">Apple</span>
+        </div>
+        <div class="story-quote">Cleared Apple's notoriously tough technical round on my first try. The prep kit's focus on design patterns was exactly what I needed.</div>
+      </div>
+      <div class="story-card">
+        <div class="story-person">
+          <div class="story-avatar">S</div>
+          <div class="story-person-info">
+            <h3>Sneha Roy</h3>
+            <p>Software Engineer at Netflix</p>
+          </div>
+        </div>
+        <div style="margin:4px 0">
+          <span class="netflix-logo" style="font-size:14px">NETFLIX</span>
+        </div>
+        <div class="story-quote">Netflix interviews are brutal — but ShadowCoach's culture fit module and system design mock sessions made all the difference.</div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ═══════════════ PREP MODAL ═══════════════ -->
+<div class="modal-overlay" id="prepModal">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div>
+        <h2 id="modalTitle">Google Preparation</h2>
+        <p id="modalSubtitle">DSA Practice + MCQ Quiz</p>
+      </div>
+      <button class="modal-close" onclick="closePrep()">✕</button>
+    </div>
+    <div class="modal-tabs">
+      <button class="modal-tab active" onclick="switchModalTab('dsa')">💻 DSA Practice</button>
+      <button class="modal-tab" onclick="switchModalTab('mcq')">📝 MCQ Quiz (10 Questions)</button>
+    </div>
+
+    <!-- DSA TAB -->
+    <div class="modal-body active" id="modal-dsa">
+      <div class="dsa-layout">
+        <!-- LEFT: Problem -->
+        <div class="problem-panel">
+          <div class="problem-selector" id="problemSelector"></div>
+          <div class="problem-box" id="problemBox">
+            <h3 id="probTitle">Two Sum</h3>
+            <span class="difficulty-label easy" id="probDiff">Easy</span>
+            <div class="problem-desc" id="probDesc"></div>
+            <div class="problem-examples" id="probExamples"></div>
+          </div>
+        </div>
+        <!-- RIGHT: Editor -->
+        <div class="editor-panel">
+          <div class="editor-controls">
+            <select class="lang-select" id="langSelect" onchange="updateTemplate()">
+              <option value="javascript">JavaScript</option>
+              <option value="python">Python</option>
+              <option value="java">Java</option>
+            </select>
+            <button class="run-btn" onclick="runCode()">
+              <svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+              Run Code
+            </button>
+          </div>
+          <div class="code-editor">
+            <div class="editor-header">
+              <div class="dot dot-red"></div>
+              <div class="dot dot-yellow"></div>
+              <div class="dot dot-green"></div>
+              <span style="margin-left:8px;font-size:12px;color:#555;font-family:'JetBrains Mono',monospace" id="fileLabel">solution.js</span>
+            </div>
+            <textarea class="code-area" id="codeArea" spellcheck="false"></textarea>
+            <div class="output-area">
+              <div class="output-label">OUTPUT</div>
+              <div class="output-text" id="outputText">// Run your code to see output here</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MCQ TAB -->
+    <div class="modal-body" id="modal-mcq">
+      <div class="mcq-header-bar">
+        <h3 id="mcqTitle">MCQ Quiz</h3>
+        <span class="mcq-progress" id="mcqProgress">10 Questions</span>
+      </div>
+      <div id="mcqContainer"></div>
+      <button class="submit-mcq-btn" id="submitMcqBtn" onclick="submitMCQ()">Submit Quiz →</button>
+      <div class="mcq-result" id="mcqResult">
+        <div class="result-score" id="resultScore">8/10</div>
+        <div class="result-label" id="resultLabel">Great Job! 🎉</div>
+        <div class="result-sub" id="resultSub">You scored 80% on this quiz</div>
+        <button class="retry-btn" onclick="retryMCQ()">Try Again</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+// ── NAV ──
+const user = JSON.parse(localStorage.getItem('user') || '{}');
+document.getElementById('userName').textContent = user.name || 'vishnu';
+document.getElementById('userAvatar').textContent = (user.name || 'V').charAt(0).toUpperCase();
+function navigateTo(p){window.location.href=p}
+function logout(){localStorage.clear();window.location.href='login.html'}
+
+// ── TABS ──
+function switchTab(t){
+  document.getElementById('tab-companies').style.display = t==='companies'?'block':'none';
+  document.getElementById('tab-stories').style.display   = t==='stories'?'block':'none';
+  document.querySelectorAll('.tab-btn').forEach((b,i)=>b.classList.toggle('active',(i===0&&t==='companies')||(i===1&&t==='stories')));
+}
+function switchModalTab(t){
+  document.querySelectorAll('.modal-tab').forEach((b,i)=>b.classList.toggle('active',(i===0&&t==='dsa')||(i===1&&t==='mcq')));
+  document.querySelectorAll('.modal-body').forEach(b=>b.classList.remove('active'));
+  document.getElementById('modal-'+t).classList.add('active');
+}
+
+// ══════════════════════════════════
+// DSA PROBLEMS DATA
+// ══════════════════════════════════
+const dsaData = {
+  Google:[
+    {title:'Two Sum',diff:'easy',desc:'Given an array of integers <code>nums</code> and an integer <code>target</code>, return indices of the two numbers that add up to target. You may assume exactly one solution exists.',examples:[{input:'nums = [2,7,11,15], target = 9',output:'[0,1]'},{input:'nums = [3,2,4], target = 6',output:'[1,2]'}],
+     js:`function twoSum(nums, target) {\n  const map = {};\n  for (let i = 0; i < nums.length; i++) {\n    const comp = target - nums[i];\n    if (map[comp] !== undefined) return [map[comp], i];\n    map[nums[i]] = i;\n  }\n  return [];\n}\n\n// Test\nconsole.log(JSON.stringify(twoSum([2,7,11,15], 9)));  // [0,1]\nconsole.log(JSON.stringify(twoSum([3,2,4], 6)));        // [1,2]`,
+     py:`def two_sum(nums, target):\n    seen = {}\n    for i, n in enumerate(nums):\n        comp = target - n\n        if comp in seen:\n            return [seen[comp], i]\n        seen[n] = i\n    return []\n\n# Test\nprint(two_sum([2,7,11,15], 9))  # [0, 1]\nprint(two_sum([3,2,4], 6))      # [1, 2]`,
+     java:`// Java runs in browser sandbox - logic preview:\n// Map<Integer,Integer> map = new HashMap<>();\n// for(int i=0;i<nums.length;i++){\n//   int comp = target - nums[i];\n//   if(map.containsKey(comp)) return new int[]{map.get(comp),i};\n//   map.put(nums[i],i);\n// }`},
+    {title:'Valid Parentheses',diff:'easy',desc:'Given a string <code>s</code> containing just the characters \'(\', \')\', \'{\', \'}\', \'[\' and \']\', determine if the input string is valid.',examples:[{input:'s = "()"',output:'true'},{input:'s = "([)]"',output:'false'}],
+     js:`function isValid(s) {\n  const stack = [];\n  const map = {')':'(',']':'[','}':'{'};\n  for (const c of s) {\n    if ('([{'.includes(c)) stack.push(c);\n    else if (stack.pop() !== map[c]) return false;\n  }\n  return stack.length === 0;\n}\n\nconsole.log(isValid("()"));     // true\nconsole.log(isValid("([)]"));   // false\nconsole.log(isValid("{[]}"));   // true`,
+     py:`def is_valid(s):\n    stack = []\n    mapping = {')':'(',']':'[','}':'{'}\n    for ch in s:\n        if ch in '([{':\n            stack.append(ch)\n        elif not stack or stack.pop() != mapping[ch]:\n            return False\n    return not stack\n\nprint(is_valid("()"))    # True\nprint(is_valid("([)]"))  # False`,
+     java:`// Java preview:\n// Deque<Character> stack = new ArrayDeque<>();\n// Map<Character,Character> map = Map.of(')','(',']','[','}','{');\n// for(char c : s.toCharArray()){ ... }`},
+    {title:'Longest Substring',diff:'medium',desc:'Given a string <code>s</code>, find the length of the longest substring without repeating characters.',examples:[{input:'s = "abcabcbb"',output:'3 ("abc")'},{input:'s = "bbbbb"',output:'1 ("b")'}],
+     js:`function lengthOfLongestSubstring(s) {\n  let map = {}, max = 0, left = 0;\n  for (let r = 0; r < s.length; r++) {\n    if (map[s[r]] >= left) left = map[s[r]] + 1;\n    map[s[r]] = r;\n    max = Math.max(max, r - left + 1);\n  }\n  return max;\n}\n\nconsole.log(lengthOfLongestSubstring("abcabcbb")); // 3\nconsole.log(lengthOfLongestSubstring("bbbbb"));    // 1`,
+     py:`def length_of_longest_substring(s):\n    seen = {}\n    max_len = left = 0\n    for r, ch in enumerate(s):\n        if ch in seen and seen[ch] >= left:\n            left = seen[ch] + 1\n        seen[ch] = r\n        max_len = max(max_len, r - left + 1)\n    return max_len\n\nprint(length_of_longest_substring("abcabcbb")) # 3`,
+     java:`// Java preview:\n// int left=0, max=0;\n// Map<Character,Integer> map = new HashMap<>();\n// for(int r=0;r<s.length();r++){...}`},
+    {title:'Binary Search',diff:'easy',desc:'Given a sorted array <code>nums</code> and a target value, return the index if found, else return -1.',examples:[{input:'nums = [-1,0,3,5,9,12], target = 9',output:'4'},{input:'nums = [1,3,5], target = 2',output:'-1'}],
+     js:`function search(nums, target) {\n  let lo = 0, hi = nums.length - 1;\n  while (lo <= hi) {\n    const mid = (lo + hi) >> 1;\n    if (nums[mid] === target) return mid;\n    nums[mid] < target ? lo = mid + 1 : hi = mid - 1;\n  }\n  return -1;\n}\n\nconsole.log(search([-1,0,3,5,9,12], 9)); // 4\nconsole.log(search([1,3,5], 2));          // -1`,
+     py:`def search(nums, target):\n    lo, hi = 0, len(nums)-1\n    while lo <= hi:\n        mid = (lo+hi)//2\n        if nums[mid] == target: return mid\n        elif nums[mid] < target: lo = mid+1\n        else: hi = mid-1\n    return -1\n\nprint(search([-1,0,3,5,9,12], 9)) # 4`,
+     java:`// Java preview:\n// int lo=0, hi=nums.length-1;\n// while(lo<=hi){\n//   int mid=(lo+hi)>>>1;\n//   if(nums[mid]==target) return mid;\n//   else if(nums[mid]<target) lo=mid+1;\n//   else hi=mid-1;\n// } return -1;`},
+    {title:'Merge Intervals',diff:'medium',desc:'Given an array of intervals, merge all overlapping intervals and return the non-overlapping intervals.',examples:[{input:'intervals = [[1,3],[2,6],[8,10],[15,18]]',output:'[[1,6],[8,10],[15,18]]'}],
+     js:`function merge(intervals) {\n  intervals.sort((a,b)=>a[0]-b[0]);\n  const res = [intervals[0]];\n  for (const [s,e] of intervals.slice(1)) {\n    const last = res[res.length-1];\n    if (s <= last[1]) last[1] = Math.max(last[1], e);\n    else res.push([s,e]);\n  }\n  return res;\n}\n\nconsole.log(JSON.stringify(merge([[1,3],[2,6],[8,10],[15,18]])));`,
+     py:`def merge(intervals):\n    intervals.sort()\n    res = [intervals[0]]\n    for s,e in intervals[1:]:\n        if s <= res[-1][1]:\n            res[-1][1] = max(res[-1][1], e)\n        else:\n            res.append([s,e])\n    return res\n\nprint(merge([[1,3],[2,6],[8,10],[15,18]]))`,
+     java:`// Java preview:\n// Arrays.sort(intervals,(a,b)->a[0]-b[0]);\n// List<int[]> res = new ArrayList<>();\n// for(int[] i:intervals){\n//   if(res.isEmpty()||res.get(res.size()-1)[1]<i[0]) res.add(i);\n//   else res.get(res.size()-1)[1]=Math.max(res.get(res.size()-1)[1],i[1]);\n// }`},
+  ]
+};
+// Reuse Google problems for other companies (can be extended)
+['Amazon','Microsoft','Meta','Apple','Netflix'].forEach(c=>dsaData[c]=dsaData.Google);
+
+// ══════════════════════════════════
+// MCQ DATA
+// ══════════════════════════════════
+const mcqData = {
+  Google:[
+    {q:'What is the time complexity of binary search?',opts:['O(n)','O(log n)','O(n²)','O(1)'],ans:1},
+    {q:'Which data structure uses LIFO (Last In First Out) principle?',opts:['Queue','Stack','Heap','LinkedList'],ans:1},
+    {q:'What does "Big O notation" describe?',opts:['Memory usage only','Best case performance','Upper bound of time/space complexity','Average case only'],ans:2},
+    {q:'Which sorting algorithm has O(n log n) average case?',opts:['Bubble Sort','Insertion Sort','Merge Sort','Selection Sort'],ans:2},
+    {q:'In a binary tree, what is the maximum number of nodes at depth d?',opts:['d','2^d','2d','d²'],ans:1},
+    {q:'What is a Hash Map\'s average time complexity for lookup?',opts:['O(n)','O(log n)','O(1)','O(n log n)'],ans:2},
+    {q:'Which traversal visits root → left → right?',opts:['Inorder','Postorder','Preorder','Level order'],ans:2},
+    {q:'What is a "greedy algorithm"?',opts:['Always backtracks','Makes locally optimal choices','Uses dynamic programming','Always finds global optimum'],ans:1},
+    {q:'Which graph algorithm finds the shortest path in an unweighted graph?',opts:['DFS','BFS','Dijkstra','Bellman-Ford'],ans:1},
+    {q:'What is the space complexity of DFS on a tree with n nodes?',opts:['O(1)','O(log n)','O(n)','O(n²)'],ans:2},
+  ],
+  Amazon:[
+    {q:'What is Amazon\'s "Customer Obsession" leadership principle about?',opts:['Cutting costs for customers','Prioritizing customer needs above all','Meeting quarterly targets','Delivering fast products'],ans:1},
+    {q:'Which AWS service is used for serverless compute?',opts:['EC2','S3','Lambda','RDS'],ans:2},
+    {q:'What does STAR stand for in behavioral interviews?',opts:['Strategy, Task, Action, Result','Situation, Task, Action, Result','Situation, Team, Action, Result','Strategy, Team, Agility, Result'],ans:1},
+    {q:'Which data structure is best for implementing a priority queue?',opts:['Array','Stack','Heap','Linked List'],ans:2},
+    {q:'What is "Disagree and Commit"?',opts:['Refusing to disagree','Disagreeing but committing to the decision','Always agreeing','Avoiding conflict'],ans:1},
+    {q:'Amazon\'s leadership principle "Bias for Action" encourages?',opts:['Slow careful decisions','Taking calculated risks quickly','Never acting without data','Waiting for consensus'],ans:1},
+    {q:'What is the time complexity of inserting into a heap?',opts:['O(1)','O(n)','O(log n)','O(n log n)'],ans:2},
+    {q:'Which principle says "Leaders are owners. They think long term"?',opts:['Frugality','Ownership','Deliver Results','Think Big'],ans:1},
+    {q:'What does DynamoDB provide?',opts:['Relational SQL storage','NoSQL key-value store','File storage','Message queuing'],ans:1},
+    {q:'What is "Invent and Simplify" about?',opts:['Buying solutions','Expecting and requiring innovation','Avoiding change','Copying competitors'],ans:1},
+  ],
+  Microsoft:[
+    {q:'What is the primary paradigm of C#?',opts:['Functional','Object-Oriented','Procedural','Logic'],ans:1},
+    {q:'What does REST stand for?',opts:['Remote Execution Service Transfer','Representational State Transfer','Remote State Technology','Real-time Event Streaming Transfer'],ans:1},
+    {q:'Which design pattern separates UI from business logic?',opts:['Factory','Observer','MVC','Singleton'],ans:2},
+    {q:'What is Azure\'s primary competitor?',opts:['Firebase','AWS','Heroku','DigitalOcean'],ans:1},
+    {q:'What is a "microservices" architecture?',opts:['One large service','Small independent deployable services','Service on a single machine','Micro-transactions'],ans:1},
+    {q:'What does SOLID stand for (first letter)?',opts:['Simple','Single Responsibility','Structural','Service'],ans:1},
+    {q:'Which SQL keyword removes duplicate rows?',opts:['UNIQUE','DISTINCT','REMOVE','FILTER'],ans:1},
+    {q:'What is the time complexity of quicksort (average)?',opts:['O(n²)','O(n)','O(n log n)','O(log n)'],ans:2},
+    {q:'What is "Technical Debt"?',opts:['Money owed for software licenses','Cost of rework from shortcuts','Hardware expenses','Cloud billing'],ans:1},
+    {q:'Which pattern creates objects without specifying exact class?',opts:['Singleton','Observer','Factory','Decorator'],ans:2},
+  ],
+  Meta:[
+    {q:'What is React\'s Virtual DOM?',opts:['Actual browser DOM','Lightweight in-memory DOM representation','Server-side DOM','Shadow DOM'],ans:1},
+    {q:'What does GraphQL solve over REST?',opts:['Security','Over-fetching and under-fetching data','Speed','Authentication'],ans:1},
+    {q:'What is the time complexity of finding an element in a balanced BST?',opts:['O(n)','O(1)','O(log n)','O(n log n)'],ans:2},
+    {q:'What is Meta\'s "Move Fast" culture about?',opts:['Ignoring bugs','Shipping quickly and iterating','Avoiding testing','Reducing team size'],ans:1},
+    {q:'Which algorithm is used in Facebook\'s social graph?',opts:['Binary Search','BFS/DFS on graphs','Bubble Sort','Merge Sort'],ans:1},
+    {q:'What is "Product Sense"?',opts:['Knowing product specs','Understanding user needs and business impact','Marketing skills','Design only'],ans:1},
+    {q:'What is the space complexity of a recursive Fibonacci without memoization?',opts:['O(1)','O(n)','O(log n)','O(2^n)'],ans:1},
+    {q:'What does A/B testing measure?',opts:['Algorithm efficiency','User response to two variants','Code quality','System load'],ans:1},
+    {q:'Which React hook manages side effects?',opts:['useState','useRef','useEffect','useContext'],ans:2},
+    {q:'What is "Trie" data structure used for?',opts:['Sorting numbers','Prefix-based string search','Graph traversal','Hash computation'],ans:1},
+  ],
+  Apple:[
+    {q:'What programming language is primarily used for iOS development?',opts:['Java','Swift','Kotlin','C++'],ans:1},
+    {q:'What is HIG in Apple development?',opts:['High-performance Interface Guide','Human Interface Guidelines','Hybrid Integration Guide','Hardware Interface Group'],ans:1},
+    {q:'What does MVC stand for?',opts:['Model View Controller','Module Version Control','Master View Component','Main Visual Container'],ans:0},
+    {q:'What is the main purpose of Grand Central Dispatch (GCD)?',opts:['UI rendering','Managing concurrent tasks','Networking','Data persistence'],ans:1},
+    {q:'Which design principle means "less but better"?',opts:['Consistency','Simplicity','Reduction','Clarity'],ans:1},
+    {q:'What is the time complexity of sorting an array of n elements optimally?',opts:['O(n)','O(n²)','O(n log n)','O(log n)'],ans:2},
+    {q:'What is "Accessibility" in iOS?',opts:['Performance optimization','Features enabling disabled users to use apps','Localization','Security'],ans:1},
+    {q:'What does Core Data provide?',opts:['Networking','Object graph management and persistence','UI components','Animations'],ans:1},
+    {q:'What is a memory leak?',opts:['Low memory warning','Memory never freed causing growth','Fast memory access','Cache overflow'],ans:1},
+    {q:'What is the key difference between struct and class in Swift?',opts:['No difference','Struct is value type, class is reference type','Class is value type','Struct allows inheritance'],ans:1},
+  ],
+  Netflix:[
+    {q:'What is Netflix\'s "Freedom and Responsibility" culture about?',opts:['Strict rules and monitoring','High freedom with high accountability','No rules at all','Bureaucracy'],ans:1},
+    {q:'What is the CAP theorem?',opts:['Cache, API, Performance','Consistency, Availability, Partition Tolerance','Code, Architecture, Process','Core, Application, Protocol'],ans:1},
+    {q:'What does CDN stand for?',opts:['Content Delivery Network','Central Data Node','Core Distribution Network','Cached Dynamic Network'],ans:0},
+    {q:'What is "Chaos Engineering"?',opts:['Unplanned code changes','Intentionally injecting failures to test resilience','Random deployments','Disorganized development'],ans:1},
+    {q:'What does microservices architecture help with?',opts:['Simplifying monolith','Independent scaling and deployment of services','Reducing server cost','Eliminating databases'],ans:1},
+    {q:'What is Netflix\'s "Keeper Test"?',opts:['Security audit','Would you fight to keep this person?','Performance benchmark','Code review standard'],ans:1},
+    {q:'What is a "Circuit Breaker" design pattern?',opts:['Electrical safety feature','Prevents cascading failures in distributed systems','Breaks infinite loops','Disconnects APIs'],ans:1},
+    {q:'What does eventual consistency mean?',opts:['Immediate consistency','System becomes consistent over time','No consistency guarantee','Consistent only at peak load'],ans:1},
+    {q:'What is horizontal scaling?',opts:['Upgrading a single server','Adding more servers to distribute load','Increasing RAM','Faster CPU'],ans:1},
+    {q:'What is the main purpose of a message queue?',opts:['Database storage','Decoupling services via async communication','UI rendering','Load balancing'],ans:1},
+  ],
+};
+
+// ══════════════════════════════════
+// STATE
+// ══════════════════════════════════
+let activeCompany = 'Google';
+let activeProbIdx = 0;
+let mcqAnswers = {};
+let mcqSubmitted = false;
+
+// ══════════════════════════════════
+// MODAL
+// ══════════════════════════════════
+function openPrep(company){
+  activeCompany = company;
+  mcqAnswers = {};
+  mcqSubmitted = false;
+  document.getElementById('modalTitle').textContent = company + ' Preparation';
+  document.getElementById('modalSubtitle').textContent = 'DSA Practice + MCQ Quiz';
+  document.getElementById('mcqTitle').textContent = company + ' MCQ Quiz';
+  document.getElementById('prepModal').classList.add('show');
+  document.body.style.overflow='hidden';
+  switchModalTab('dsa');
+  loadDSA(0);
+  buildMCQ();
+}
+function closePrep(){
+  document.getElementById('prepModal').classList.remove('show');
+  document.body.style.overflow='';
+}
+document.getElementById('prepModal').addEventListener('click',e=>{if(e.target===document.getElementById('prepModal'))closePrep()});
+
+// ══════════════════════════════════
+// DSA
+// ══════════════════════════════════
+function loadDSA(idx){
+  activeProbIdx = idx;
+  const probs = dsaData[activeCompany];
+  // Build chips
+  const sel = document.getElementById('problemSelector');
+  sel.innerHTML = probs.map((p,i)=>`<button class="prob-chip${i===idx?' active':''}" onclick="loadDSA(${i})">${p.title}</button>`).join('');
+  const p = probs[idx];
+  document.getElementById('probTitle').textContent = p.title;
+  const d = document.getElementById('probDiff');
+  d.textContent = p.diff.charAt(0).toUpperCase()+p.diff.slice(1);
+  d.className = 'difficulty-label '+( p.diff==='easy'?'easy':p.diff==='medium'?'medium':'hard2');
+  document.getElementById('probDesc').innerHTML = p.desc;
+  document.getElementById('probExamples').innerHTML = p.examples.map(e=>`<div class="example"><strong>Input:</strong> ${e.input}<br><strong>Output:</strong> ${e.output}</div>`).join('');
+  updateTemplate();
+}
+function updateTemplate(){
+  const probs = dsaData[activeCompany];
+  const p = probs[activeProbIdx];
+  const lang = document.getElementById('langSelect').value;
+  const labels = {javascript:'solution.js',python:'solution.py',java:'Solution.java'};
+  document.getElementById('fileLabel').textContent = labels[lang];
+  document.getElementById('codeArea').value = p[lang==='javascript'?'js':lang==='python'?'py':'java'];
+  document.getElementById('outputText').textContent = '// Run your code to see output here';
+  document.getElementById('outputText').className = 'output-text';
+}
+function runCode(){
+  const lang = document.getElementById('langSelect').value;
+  const code = document.getElementById('codeArea').value;
+  const out = document.getElementById('outputText');
+  if(lang==='javascript'){
+    try{
+      const logs=[];
+      const origLog = console.log;
+      console.log = (...args)=>logs.push(args.map(a=>typeof a==='object'?JSON.stringify(a):String(a)).join(' '));
+      // eslint-disable-next-line no-new-func
+      new Function(code)();
+      console.log = origLog;
+      out.textContent = logs.join('\n') || '✓ Code ran successfully (no output)';
+      out.className = 'output-text';
+    }catch(e){
+      out.textContent = '❌ Error: '+e.message;
+      out.className = 'output-text error';
+    }
+  } else if(lang==='python'){
+    out.textContent = '⚠ Python runs server-side. Output shown conceptually:\n' + code.split('\n').filter(l=>l.trim().startsWith('print')).map(l=>{
+      const m=l.match(/print\((.*)\)/);
+      return m ? '→ '+m[1] : l;
+    }).join('\n') || '// Python: run locally to see output';
+    out.className = 'output-text';
+  } else {
+    out.textContent = '// Java: This is a preview. Compile locally with javac.\n// Logic shown in comments above.';
+    out.className = 'output-text';
+  }
+}
+
+// ══════════════════════════════════
+// MCQ
+// ══════════════════════════════════
+function buildMCQ(){
+  const qs = mcqData[activeCompany] || mcqData.Google;
+  mcqAnswers = {};
+  mcqSubmitted = false;
+  document.getElementById('submitMcqBtn').style.display='block';
+  document.getElementById('mcqResult').classList.remove('show');
+  document.getElementById('mcqProgress').textContent = qs.length + ' Questions';
+  document.getElementById('mcqContainer').innerHTML = qs.map((q,qi)=>`
+    <div class="mcq-question" id="mcqq${qi}">
+      <div class="mcq-q-text"><span class="mcq-q-num">${qi+1}</span>${q.q}</div>
+      <div class="mcq-options">
+        ${q.opts.map((o,oi)=>`
+          <div class="mcq-option" id="opt${qi}_${oi}" onclick="selectOption(${qi},${oi})">
+            <div class="option-letter">${['A','B','C','D'][oi]}</div>
+            <div class="option-text">${o}</div>
+          </div>`).join('')}
+      </div>
+    </div>`).join('');
+}
+function selectOption(qi,oi){
+  if(mcqSubmitted) return;
+  const qs = mcqData[activeCompany];
+  // Remove old selection
+  qs[qi].opts.forEach((_,i)=>document.getElementById('opt'+qi+'_'+i).classList.remove('selected'));
+  document.getElementById('opt'+qi+'_'+oi).classList.add('selected');
+  mcqAnswers[qi]=oi;
+}
+function submitMCQ(){
+  const qs = mcqData[activeCompany];
+  const answered = Object.keys(mcqAnswers).length;
+  if(answered < qs.length){
+    const unanswered = qs.length - answered;
+    if(!confirm(`You have ${unanswered} unanswered question(s). Submit anyway?`)) return;
+  }
+  mcqSubmitted = true;
+  document.getElementById('submitMcqBtn').style.display='none';
+  let score=0;
+  qs.forEach((q,qi)=>{
+    const userAns = mcqAnswers[qi];
+    q.opts.forEach((_,oi)=>{
+      const el = document.getElementById('opt'+qi+'_'+oi);
+      if(oi===q.ans){el.classList.add('correct')}
+      else if(oi===userAns && userAns!==q.ans){el.classList.add('wrong')}
+      el.classList.remove('selected');
+    });
+    if(userAns===q.ans) score++;
+  });
+  const pct = Math.round(score/qs.length*100);
+  document.getElementById('resultScore').textContent = score+'/'+qs.length;
+  document.getElementById('resultLabel').textContent = pct>=80?'Excellent! 🎉':pct>=60?'Good Job! 👍':'Keep Practicing! 💪';
+  document.getElementById('resultSub').textContent = `You scored ${pct}% on the ${activeCompany} quiz`;
+  document.getElementById('mcqResult').classList.add('show');
+  document.getElementById('mcqResult').scrollIntoView({behavior:'smooth'});
+}
+function retryMCQ(){buildMCQ()}
+</script>
+</body>
+</html>

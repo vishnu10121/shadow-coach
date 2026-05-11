@@ -1,0 +1,973 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ShadowCoach AI - Resume ATS Analyzer</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #0a0c15;
+            min-height: 100vh;
+        }
+
+        .dashboard {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 280px;
+            background: #0f0f0f;
+            border-right: 1px solid #1a1a1a;
+            padding: 32px 24px;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 48px;
+        }
+
+        .logo-icon {
+            width: 44px;
+            height: 44px;
+            background: linear-gradient(135deg, #271fa4 0%, #3b82f6 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 18px;
+            color: white;
+        }
+
+        .logo-text h2 {
+            font-size: 20px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+        }
+
+        .logo-text h2 .shadow {
+            background: linear-gradient(135deg, #ffffff 0%, #94a3b8 100%);
+           background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .logo-text h2 .ai {
+            color: #3b82f6;
+        }
+
+        .logo-text p {
+            font-size: 9px;
+            color: #3b82f6;
+            letter-spacing: 1.5px;
+            font-weight: 600;
+            margin-top: 2px;
+        }
+
+        .nav-menu {
+            list-style: none;
+            margin-top: 8px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 14px 16px;
+            margin: 4px 0;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            color: #888;
+            font-weight: 500;
+            font-size: 16px;
+        }
+
+        .nav-item svg {
+            width: 22px;
+            height: 22px;
+            stroke: #888;
+            stroke-width: 1.5;
+            fill: none;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            background: #1a1a1a;
+            color: white;
+        }
+
+        .nav-item:hover svg, .nav-item.active svg {
+            stroke: #3b82f6;
+        }
+
+        .user-section {
+            position: absolute;
+            bottom: 32px;
+            left: 24px;
+            right: 24px;
+            padding: 16px;
+            background: #1a1a1a;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border: 1px solid #2a2a2a;
+        }
+
+        .user-avatar {
+            width: 44px;
+            height: 44px;
+            background: linear-gradient(135deg, #271fa4 0%, #3b82f6 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 18px;
+            color: white;
+        }
+
+        .user-info {
+            flex: 1;
+        }
+
+        .user-name {
+            font-weight: 700;
+            color: white;
+            font-size: 16px;
+        }
+
+        .logout-btn {
+            font-size: 13px;
+            color: #888;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+
+        .logout-btn:hover {
+            color: #ef4444;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: 280px;
+            padding: 40px 48px;
+        }
+
+        .page-header {
+            margin-bottom: 32px;
+        }
+
+        .page-header h1 {
+            font-size: 36px;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 8px;
+        }
+
+        .page-header p {
+            font-size: 16px;
+            color: #888;
+        }
+
+        /* Role Selector */
+        .role-selector {
+            max-width: 300px;
+            margin-bottom: 24px;
+        }
+
+        .role-label {
+            display: block;
+            font-size: 14px;
+            color: #94a3b8;
+            margin-bottom: 8px;
+        }
+
+        .role-select {
+            width: 100%;
+            padding: 12px 16px;
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 12px;
+            color: #f1f5f9;
+            font-size: 14px;
+            cursor: pointer;
+            font-family: inherit;
+        }
+
+        /* Upload Area */
+        .upload-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            padding: 40px;
+        }
+
+        .upload-area {
+            cursor: pointer;
+            display: block;
+        }
+
+        .upload-content {
+            padding: 48px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 2px dashed rgba(255, 255, 255, 0.15);
+            border-radius: 20px;
+            text-align: center;
+            transition: all 0.2s;
+        }
+
+        .upload-content:hover {
+            border-color: #3b82f6;
+            background: rgba(59, 130, 246, 0.05);
+        }
+
+        .upload-icon {
+            font-size: 48px;
+            display: block;
+            margin-bottom: 16px;
+        }
+
+        .upload-text {
+            display: block;
+            font-size: 16px;
+            color: white;
+            margin-bottom: 8px;
+        }
+
+        .upload-hint {
+            font-size: 12px;
+            color: #64748b;
+        }
+
+        /* Analyzing Animation */
+        .analyzing-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            padding: 48px;
+        }
+
+        .analyzing-content {
+            text-align: center;
+        }
+
+        .spinner {
+            width: 48px;
+            height: 48px;
+            border: 3px solid rgba(59, 130, 246, 0.2);
+            border-top-color: #3b82f6;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 24px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .timer-display {
+            font-size: 18px;
+            font-weight: 600;
+            color: #3b82f6;
+            margin-bottom: 24px;
+        }
+
+        .analyzing-steps {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .step-item {
+            font-size: 14px;
+            padding: 6px 12px;
+            transition: all 0.3s ease;
+        }
+
+        /* Results Card */
+        .results-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            overflow: hidden;
+        }
+
+        .score-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 32px;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .score-circle {
+            position: relative;
+            display: inline-block;
+        }
+
+        .score-badge {
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            color: white;
+            white-space: nowrap;
+        }
+
+        .score-info {
+            text-align: center;
+        }
+
+        .issues-count {
+            background: rgba(239, 68, 68, 0.1);
+            padding: 8px 16px;
+            border-radius: 40px;
+            color: #ef4444;
+            font-size: 14px;
+            margin-bottom: 12px;
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 0 24px;
+            flex-wrap: wrap;
+        }
+
+        .tab {
+            padding: 12px 20px;
+            background: transparent;
+            border: none;
+            color: #64748b;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+
+        .tab.active {
+            color: #3b82f6;
+            border-bottom: 2px solid #3b82f6;
+        }
+
+        .tab-content {
+            padding: 32px;
+        }
+
+        .tab-content h3 {
+            font-size: 16px;
+            font-weight: 600;
+            color: #3b82f6;
+            margin-bottom: 16px;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 16px;
+        }
+
+        .metric-card {
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 16px;
+            padding: 20px;
+        }
+
+        .metric-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+
+        .metric-value {
+            text-align: center;
+            padding: 16px 0;
+            font-size: 24px;
+            font-weight: 700;
+            color: white;
+        }
+
+        /* Sections List - White & Strong */
+        .sections-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .section-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            border-left: 4px solid #10b981;
+        }
+
+        .section-name {
+            font-size: 16px;
+            font-weight: 700;
+            color: white;
+            letter-spacing: 0.3px;
+        }
+
+        .section-status {
+            font-size: 14px;
+            font-weight: 600;
+            padding: 4px 12px;
+            border-radius: 20px;
+        }
+
+        .section-status.found {
+            background: rgba(16, 185, 129, 0.15);
+            color: #10b981;
+        }
+
+        .section-status.missing {
+            background: rgba(239, 68, 68, 0.15);
+            color: #ef4444;
+        }
+
+        /* Keyword Analysis */
+        .keyword-section {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .keyword-box {
+            padding: 20px;
+            border-radius: 16px;
+        }
+
+        .keyword-box.found {
+            background: rgba(16, 185, 129, 0.05);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+
+        .keyword-box.missing {
+            background: rgba(239, 68, 68, 0.05);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+        }
+
+        .keyword-box h4 {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 16px;
+        }
+
+        .keyword-box.found h4 {
+            color: #10b981;
+        }
+
+        .keyword-box.missing h4 {
+            color: #ef4444;
+        }
+
+        .keyword-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .keyword-tag {
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .keyword-tag.found {
+            background: rgba(16, 185, 129, 0.15);
+            color: #10b981;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .keyword-tag.missing {
+            background: rgba(239, 68, 68, 0.15);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        .suggestions-list {
+            padding-left: 20px;
+            color: #cbd5e1;
+        }
+
+        .suggestions-list li {
+            margin-bottom: 12px;
+            line-height: 1.5;
+        }
+
+        .unlock-btn {
+            display: block;
+            width: calc(100% - 64px);
+            margin: 0 32px 32px 32px;
+            padding: 14px;
+            background: linear-gradient(135deg, #3b82f6, #271fa4);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .unlock-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(59, 130, 246, 0.3);
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100px;
+                padding: 24px 16px;
+            }
+            .logo-text, .nav-item span:not(.nav-icon), .user-info {
+                display: none;
+            }
+            .main-content {
+                margin-left: 100px;
+                padding: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard">
+        <!-- SIDEBAR -->
+        <div class="sidebar">
+            <div class="logo">
+                <div class="logo-icon">⚡</div>
+                <div class="logo-text">
+                    <h2><span class="shadow">ShadowCoach</span><span class="ai"> AI</span></h2>
+                    <p>YOUR INTERVIEW COACH</p>
+                </div>
+            </div>
+            <ul class="nav-menu">
+                <li class="nav-item" onclick="navigateTo('dashboard.html')">
+                    <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2h-5v-7H9v7H4a2 2 0 0 1-2-2z"/></svg>
+                    <span>Dashboard</span>
+                </li>
+                <li class="nav-item active">
+                    <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                    <span>Resume</span>
+                </li>
+                <li class="nav-item" onclick="navigateTo('interview.html')">
+                    <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                    <span>Interview</span>
+                </li>
+                <li class="nav-item" onclick="navigateTo('prep-kit.html')">
+                    <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+                    <span>Prep Kit</span>
+                </li>
+                <li class="nav-item" onclick="navigateTo('history.html')">
+                    <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path d="M12 8v4l3 3M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/></svg>
+                    <span>History</span>
+                </li>
+            </ul>
+            <div class="user-section">
+                <div class="user-avatar" id="userAvatar">V</div>
+                <div class="user-info">
+                    <div class="user-name" id="userName">vishnu</div>
+                    <div class="logout-btn" onclick="logout()">Logout</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MAIN CONTENT -->
+        <div class="main-content">
+            <div class="page-header">
+                <h1>Resume ATS Analyzer</h1>
+                <p>Upload your resume to get accurate ATS score and keyword suggestions</p>
+            </div>
+
+            <div id="uploadSection">
+                <div class="role-selector">
+                    <label class="role-label">Target Role</label>
+                    <select id="roleSelect" class="role-select">
+                        <option>Software Engineer</option>
+                        <option>Product Manager</option>
+                        <option>Data Scientist</option>
+                        <option>Frontend Developer</option>
+                        <option>Backend Developer</option>
+                        <option>Full Stack Developer</option>
+                    </select>
+                </div>
+
+                <div class="upload-card">
+                    <label class="upload-area" id="uploadArea">
+                        <input type="file" id="fileInput" accept=".pdf,.docx,.txt" hidden>
+                        <div class="upload-content">
+                            <div class="upload-icon">📄</div>
+                            <span class="upload-text">Upload your resume (PDF, DOCX, or TXT)</span>
+                            <span class="upload-hint">Max 5MB • Secure analysis • Takes 15-20 seconds</span>
+                        </div>
+                    </label>
+                </div>
+            </div>
+
+            <div id="analyzingSection" style="display: none;"></div>
+            <div id="resultsSection" style="display: none;"></div>
+        </div>
+    </div>
+
+    <script>
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
+        const token = localStorage.getItem('token');
+        
+        if (!token) {
+            window.location.href = 'login.html';
+        }
+        
+        document.getElementById('userName').innerHTML = user.name || 'vishnu';
+        document.getElementById('userAvatar').innerHTML = (user.name || 'V').charAt(0).toUpperCase();
+        
+        let processingSteps = [
+            { id: 0, name: '📄 Parsing your resume document...' },
+            { id: 1, name: '🔍 Analyzing your work experience...' },
+            { id: 2, name: '📚 Extracting technical skills...' },
+            { id: 3, name: '🎯 Matching keywords for role...' },
+            { id: 4, name: '⚙️ Calculating ATS compatibility...' },
+            { id: 5, name: '📊 Generating detailed report...' }
+        ];
+        
+        function navigateTo(page) { window.location.href = page; }
+        function logout() { localStorage.clear(); window.location.href = 'login.html'; }
+        
+        document.getElementById('uploadArea').addEventListener('click', () => {
+            document.getElementById('fileInput').click();
+        });
+        
+        document.getElementById('fileInput').addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            const role = document.getElementById('roleSelect').value;
+            document.getElementById('uploadSection').style.display = 'none';
+            await startAnalysis(file, role);
+        });
+        
+        async function startAnalysis(file, role) {
+            const analyzingDiv = document.getElementById('analyzingSection');
+            analyzingDiv.style.display = 'block';
+            analyzingDiv.innerHTML = `
+                <div class="analyzing-card">
+                    <div class="analyzing-content">
+                        <div class="spinner"></div>
+                        <div class="timer-display" id="timerDisplay">⏱️ Analyzing... 0 seconds</div>
+                        <div class="analyzing-steps" id="analyzingSteps"></div>
+                        <p style="font-size: 12px; color: #64748b; margin-top: 16px;" id="analyzingNote">Step 1/6: Parsing your resume...</p>
+                    </div>
+                </div>
+            `;
+            
+            const stepsContainer = document.getElementById('analyzingSteps');
+            processingSteps.forEach((step, idx) => {
+                const stepDiv = document.createElement('div');
+                stepDiv.className = 'step-item';
+                stepDiv.id = `step_${idx}`;
+                stepDiv.innerHTML = `⏳ ${step.name}`;
+                stepDiv.style.color = '#64748b';
+                stepsContainer.appendChild(stepDiv);
+            });
+            
+            let currentStep = 0;
+            let seconds = 0;
+            
+            const timer = setInterval(() => {
+                seconds++;
+                document.getElementById('timerDisplay').innerHTML = `⏱️ Analyzing... ${seconds} seconds`;
+            }, 1000);
+            
+            for (let i = 0; i < processingSteps.length; i++) {
+                currentStep = i;
+                document.getElementById(`step_${i}`).innerHTML = `🔄 ${processingSteps[i].name}`;
+                document.getElementById(`step_${i}`).style.color = '#3b82f6';
+                document.getElementById('analyzingNote').innerHTML = `Step ${i+1}/${processingSteps.length}: ${processingSteps[i].name}`;
+                await new Promise(r => setTimeout(r, 2000));
+                document.getElementById(`step_${i}`).innerHTML = `✅ ${processingSteps[i].name}`;
+                document.getElementById(`step_${i}`).style.color = '#10b981';
+            }
+            
+            clearInterval(timer);
+            
+            const result = await analyzeResumeAPI(file, role, seconds);
+            analyzingDiv.style.display = 'none';
+            displayResults(result, seconds);
+        }
+        
+        async function analyzeResumeAPI(file, role, processingTime) {
+            return new Promise((resolve) => {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const content = e.target.result;
+                    const text = typeof content === 'string' ? content.toLowerCase() : '';
+                    
+                    // Comprehensive keyword database
+                    const techKeywords = {
+                        languages: ['python', 'javascript', 'java', 'c++', 'c#', 'go', 'rust', 'typescript', 'php', 'swift', 'kotlin', 'ruby', 'scala', 'perl', 'r', 'matlab', 'dart', 'html', 'css', 'sql', 'nosql'],
+                        frameworks: ['react', 'angular', 'vue', 'django', 'flask', 'spring', 'express', 'rails', 'laravel', 'asp.net', 'fastapi', 'next.js', 'nuxt', 'svelte'],
+                        databases: ['mysql', 'postgresql', 'mongodb', 'oracle', 'redis', 'cassandra', 'dynamodb', 'firebase', 'sqlite', 'mariadb', 'couchdb', 'neo4j'],
+                        cloud: ['aws', 'azure', 'gcp', 'google cloud', 'cloud', 'lambda', 'ec2', 's3', 'rds', 'cloudfront', 'route53', 'vpc', 'iam', 'kinesis'],
+                        devops: ['docker', 'kubernetes', 'jenkins', 'gitlab', 'github actions', 'terraform', 'ansible', 'prometheus', 'grafana', 'helm', 'istio', 'nginx'],
+                        concepts: ['api', 'rest', 'graphql', 'microservices', 'ci/cd', 'agile', 'scrum', 'tdd', 'unit testing', 'integration testing', 'system design', 'algorithms', 'data structures', 'oop', 'functional programming']
+                    };
+                    
+                    const allKeywords = [...techKeywords.languages, ...techKeywords.frameworks, ...techKeywords.databases, ...techKeywords.cloud, ...techKeywords.devops, ...techKeywords.concepts];
+                    
+                    const found = [];
+                    const missing = [];
+                    
+                    allKeywords.forEach(kw => {
+                        if (text.includes(kw)) {
+                            if (!found.includes(kw)) found.push(kw);
+                        } else {
+                            if (!missing.includes(kw) && missing.length < 15) missing.push(kw);
+                        }
+                    });
+                    
+                    // Section detection
+                    const sections = {
+                        experience: text.includes('experience') || text.includes('work experience') || text.includes('employment') || text.includes('professional experience'),
+                        education: text.includes('education') || text.includes('academic') || text.includes('degree') || text.includes('university') || text.includes('college'),
+                        skills: text.includes('skills') || text.includes('technical skills') || text.includes('core competencies') || text.includes('technologies'),
+                        summary: text.includes('summary') || text.includes('profile') || text.includes('about me') || text.includes('objective') || text.includes('professional summary')
+                    };
+                    
+                    let sectionsFound = 0;
+                    if (sections.experience) sectionsFound++;
+                    if (sections.education) sectionsFound++;
+                    if (sections.skills) sectionsFound++;
+                    if (sections.summary) sectionsFound++;
+                    
+                    // Advanced score calculation
+                    let score = 0;
+                    score += Math.min(30, (found.length / 20) * 30);
+                    score += sectionsFound * 10;
+                    
+                    // Length bonus
+                    const wordCount = text.split(/\s+/).length;
+                    if (wordCount > 300 && wordCount < 800) score += 15;
+                    else if (wordCount >= 800) score += 10;
+                    else if (wordCount >= 200) score += 5;
+                    
+                    // Format bonus
+                    if (text.includes('•') || text.includes('-') || text.includes('*')) score += 10;
+                    if (text.match(/\d+%/g) || text.match(/\$\d+/g) || text.match(/\d+\s*(?:years?|months?)/gi)) score += 10;
+                    
+                    score = Math.min(100, Math.max(0, Math.floor(score)));
+                    
+                    let level = score >= 85 ? 'Excellent' : score >= 70 ? 'Good' : score >= 50 ? 'Average' : score >= 30 ? 'Needs Improvement' : 'Poor';
+                    let color = score >= 85 ? '#10b981' : score >= 70 ? '#f59e0b' : score >= 50 ? '#f97316' : '#ef4444';
+                    
+                    let suggestions = [];
+                    if (!sections.experience) suggestions.push('Add an "Experience" section with your work history');
+                    if (!sections.education) suggestions.push('Include an "Education" section with your degrees');
+                    if (!sections.skills) suggestions.push('Add a "Skills" section listing your technical competencies');
+                    if (!sections.summary) suggestions.push('Include a professional "Summary" at the beginning of your resume');
+                    if (found.length < 10) suggestions.push('Add more relevant technical keywords from the job description');
+                    if (wordCount < 250) suggestions.push('Your resume is too short. Aim for 300-800 words');
+                    if (wordCount > 1000) suggestions.push('Your resume is too long. Keep it concise, ideally under 2 pages');
+                    if (!text.match(/\d+%/g) && !text.match(/\$\d+/g)) suggestions.push('Quantify your achievements with numbers and percentages');
+                    
+                    if (suggestions.length === 0) {
+                        suggestions = ['Your resume looks excellent! Keep it updated and tailored to each job application'];
+                    }
+                    
+                    resolve({
+                        score: score,
+                        level: level,
+                        color: color,
+                        parse_rate: Math.min(100, Math.floor(score * 0.9 + 10)),
+                        processing_time: processingTime,
+                        word_count: wordCount,
+                        sections_found: sectionsFound,
+                        sections: sections,
+                        keywords_found: found.slice(0, 12),
+                        missing_keywords: missing.slice(0, 10),
+                        feedback: [`Analysis completed in ${processingTime} seconds. Your resume scored ${score} out of 100. ${score >= 70 ? 'Great job! A few improvements will make it even better.' : 'Focus on adding the missing keywords and sections to improve your ATS compatibility.'}`],
+                        suggestions: suggestions
+                    });
+                };
+                reader.readAsText(file);
+            });
+        }
+        
+        function displayResults(result, processingTime) {
+            const resultsDiv = document.getElementById('resultsSection');
+            let activeTab = 'SECTIONS';
+            let showFullReport = false;
+            
+            function renderResults() {
+                const getScoreColor = (score) => {
+                    if (score >= 85) return '#10b981';
+                    if (score >= 70) return '#f59e0b';
+                    if (score >= 50) return '#f97316';
+                    return '#ef4444';
+                };
+                
+                const circumference = 2 * Math.PI * 60;
+                const offset = circumference - (result.score / 100) * circumference;
+                
+                let tabContent = '';
+                if (activeTab === 'CONTENT') {
+                    tabContent = `
+                        <h3>📊 ATS PARSE RATE</h3>
+                        <p style="font-size: 14px; line-height: 1.6; color: #94a3b8; margin-bottom: 24px;">Your resume has a parse rate of ${result.parse_rate}%. A higher parse rate ensures better ATS compatibility.</p>
+                        <div class="metrics-grid">
+                            <div class="metric-card">
+                                <div class="metric-header"><span style="font-size: 24px;">📄</span><span style="font-size: 14px; font-weight: 600; color: white;">Word Count</span></div>
+                                <div class="metric-value">${result.word_count} words</div>
+                            </div>
+                            <div class="metric-card">
+                                <div class="metric-header"><span style="font-size: 24px;">📂</span><span style="font-size: 14px; font-weight: 600; color: white;">Sections Found</span></div>
+                                <div class="metric-value">${result.sections_found}/4</div>
+                            </div>
+                        </div>
+                    `;
+                } else if (activeTab === 'SECTIONS') {
+                    tabContent = `
+                        <h3>📋 Resume Sections Analysis</h3>
+                        <div class="sections-list">
+                            <div class="section-item">
+                                <span class="section-name">💼 Experience</span>
+                                <span class="section-status ${result.sections.experience ? 'found' : 'missing'}">${result.sections.experience ? '✓ Found' : '✗ Missing'}</span>
+                            </div>
+                            <div class="section-item">
+                                <span class="section-name">🎓 Education</span>
+                                <span class="section-status ${result.sections.education ? 'found' : 'missing'}">${result.sections.education ? '✓ Found' : '✗ Missing'}</span>
+                            </div>
+                            <div class="section-item">
+                                <span class="section-name">⚙️ Skills</span>
+                                <span class="section-status ${result.sections.skills ? 'found' : 'missing'}">${result.sections.skills ? '✓ Found' : '✗ Missing'}</span>
+                            </div>
+                            <div class="section-item">
+                                <span class="section-name">📝 Summary/Profile</span>
+                                <span class="section-status ${result.sections.summary ? 'found' : 'missing'}">${result.sections.summary ? '✓ Found' : '✗ Missing'}</span>
+                            </div>
+                        </div>
+                    `;
+                } else if (activeTab === 'KEYWORDS') {
+                    tabContent = `
+                        <h3>🔑 Keyword Analysis</h3>
+                        <div class="keyword-section">
+                            <div class="keyword-box found">
+                                <h4>✓ Keywords Found (${result.keywords_found.length})</h4>
+                                <div class="keyword-tags">
+                                    ${result.keywords_found.map(k => `<span class="keyword-tag found">${k}</span>`).join('')}
+                                </div>
+                            </div>
+                            <div class="keyword-box missing">
+                                <h4>✗ Missing Keywords (${result.missing_keywords.length})</h4>
+                                <div class="keyword-tags">
+                                    ${result.missing_keywords.map(k => `<span class="keyword-tag missing">${k}</span>`).join('')}
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    tabContent = `
+                        <h3>💡 Suggestions to Improve</h3>
+                        <ul class="suggestions-list">
+                            ${result.suggestions.map(s => `<li>${s}</li>`).join('')}
+                        </ul>
+                    `;
+                }
+                
+                resultsDiv.innerHTML = `
+                    <div class="results-card">
+                        <div class="score-section">
+                            <div class="score-circle">
+                                <svg width="140" height="140" viewBox="0 0 140 140">
+                                    <circle cx="70" cy="70" r="60" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="10"/>
+                                    <circle cx="70" cy="70" r="60" fill="none" stroke="${getScoreColor(result.score)}" stroke-width="10" stroke-dasharray="${circumference}" stroke-dashoffset="${offset}" stroke-linecap="round" transform="rotate(-90 70 70)" style="transition: stroke-dashoffset 1s ease;"/>
+                                    <text x="70" y="65" text-anchor="middle" fill="${getScoreColor(result.score)}" font-size="28" font-weight="bold">${result.score}</text>
+                                    <text x="70" y="85" text-anchor="middle" fill="#64748b" font-size="11">out of 100</text>
+                                </svg>
+                                <div class="score-badge" style="background-color: ${getScoreColor(result.score)}">${result.level}</div>
+                            </div>
+                            <div class="score-info">
+                                <div class="issues-count">⚠️ ${result.missing_keywords.length} Keywords Missing</div>
+                                <div style="font-size: 12px; color: #64748b;">⏱️ Analysis completed in ${result.processing_time} seconds</div>
+                            </div>
+                        </div>
+                        
+                        <div class="tabs">
+                            <button class="tab ${activeTab === 'CONTENT' ? 'active' : ''}" onclick="setActiveTab('CONTENT')">CONTENT</button>
+                            <button class="tab ${activeTab === 'SECTIONS' ? 'active' : ''}" onclick="setActiveTab('SECTIONS')">SECTION</button>
+                            <button class="tab ${activeTab === 'KEYWORDS' ? 'active' : ''}" onclick="setActiveTab('KEYWORDS')">KEYWORDS</button>
+                            <button class="tab ${activeTab === 'SUGGESTIONS' ? 'active' : ''}" onclick="setActiveTab('SUGGESTIONS')">SUGGESTIONS</button>
+                        </div>
+                        
+                        <div class="tab-content">${tabContent}</div>
+                        
+                        ${!showFullReport ? `<button class="unlock-btn" onclick="showFullReportFunc()">📊 Unlock Full Report →</button>` : `
+                            <div style="margin: 0 32px 32px 32px; padding: 24px; background: rgba(255,255,255,0.02); border-radius: 16px;">
+                                <h4 style="font-size: 16px; font-weight: 700; color: white; margin-bottom: 16px;">📊 Detailed Analysis Report</h4>
+                                ${result.feedback.map(fb => `<p style="font-size: 14px; color: #cbd5e1; margin-bottom: 12px; line-height: 1.6;">${fb}</p>`).join('')}
+                                <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1);">
+                                    <p style="font-size: 13px; color: #94a3b8;"><strong style="color: white;">Recommendation:</strong> ${result.score >= 70 ? 'Your resume is strong! Focus on the missing keywords to achieve a perfect score.' : 'Focus on adding the missing sections and keywords listed above to improve your ATS compatibility.'}</p>
+                                </div>
+                                <button onclick="resetAnalyzer()" style="width: 100%; padding: 12px; background: linear-gradient(135deg, #10b981, #059669); border: none; border-radius: 12px; color: white; font-size: 13px; font-weight: 600; cursor: pointer; margin-top: 20px;">🔄 Analyze Another Resume</button>
+                            </div>
+                        `}
+                    </div>
+                `;
+            }
+            
+            window.setActiveTab = (tab) => {
+                activeTab = tab;
+                renderResults();
+            };
+            
+            window.showFullReportFunc = () => {
+                showFullReport = true;
+                renderResults();
+            };
+            
+            window.resetAnalyzer = () => {
+                document.getElementById('uploadSection').style.display = 'block';
+                document.getElementById('resultsSection').style.display = 'none';
+                document.getElementById('fileInput').value = '';
+                showFullReport = false;
+            };
+            
+            resultsDiv.style.display = 'block';
+            renderResults();
+            
+            let stats = JSON.parse(localStorage.getItem('stats') || '{}');
+            stats.resumeScans = (stats.resumeScans || 0) + 1;
+            localStorage.setItem('stats', JSON.stringify(stats));
+        }
+    </script>
+</body>
+</html>
