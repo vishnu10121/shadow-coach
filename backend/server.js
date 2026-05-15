@@ -6,6 +6,7 @@ const PORT = process.env.PORT || 5000;
 app.use(cors(
     {
         origin : "https://shadow-coach-peach.vercel.app",
+        credentials : true
 
     }
 ));
