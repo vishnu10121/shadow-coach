@@ -1,14 +1,15 @@
 const express = require('express');
 const cors = require('cors');
-const app = express();
 const PORT = process.env.PORT || 5000;
+const app = express();
 
 app.use(cors(
     {
-    
+        
         origin : ["https://shadow-coach-peach.vercel.app","https://shadow-coach-iww6obrlh-vishnu10121s-projects.vercel.app/"],
+        methods: ["GET", "POST", "PUT", "DELETE"],
         credentials : true
-
+        
     }
 ));
 app.use(express.json());
