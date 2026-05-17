@@ -357,7 +357,7 @@
                     errorDiv.style.display = 'block';
                 }
             } catch (error) {
-                errorDiv.textContent = 'Server error. Please try again.';
+                errorDiv.textContent = `Server error. Please try again. ${error.message}`;
                 errorDiv.style.display = 'block';
             }
         });
