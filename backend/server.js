@@ -6,7 +6,7 @@ const app = express();
 app.use(cors(
     {
         
-        origin : ["https://shadow-coach-peach.vercel.app","https://shadow-coach-iww6obrlh-vishnu10121s-projects.vercel.app/"],
+        origin : ["http://127.0.0.1:3000","https://shadow-coach-peach.vercel.app/","https://shadow-coach-iww6obrlh-vishnu10121s-projects.vercel.app/"],
         methods: ["GET", "POST", "PUT", "DELETE"],
         credentials : true
         
